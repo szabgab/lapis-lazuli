@@ -16,10 +16,6 @@ hook before => sub {
 	set mongo_client => $client;
 	set db => $db;
 
-	#my $users_coll = setting('db')->get_collection('users');
-	#my $id     = $users_coll->insert({ some => 'data' });
-
-	#my $data       = $users_coll->find_one({ admin => 1 });
 	#if (request->path ne '/setup' and not $data) {
 	if (request->path ne '/setup' and not _site_exists()) {
 		#request->path_info('/setup');
@@ -82,6 +78,26 @@ post '/register' => sub {
 
 	redirect '/';
 };
+
+
+get '/login' => sub {
+	template 'login';
+};
+
+post '/login' => sub {
+	die 'Missing username' if not params->{username};
+	die 'Missing password' if not params->{password};
+	my %user = (
+		username => params->{username},
+		password => sha1_base64(params->{password}),
+	);
+
+	my $users_coll = setting('db')->get_collection('users');
+	my $user_id    = $users_coll->find_one(\%user);
+	die "Could not authenticate" if not $user_id;
+	die "OK";
+};
+
 
 sub _check_new_user {
 	die 'Missing username' if not params->{username} or params->{username} !~ /^\w+$/;

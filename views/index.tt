@@ -5,7 +5,7 @@
             <h3>Join the community</h3>
             <ul class="links">
               <li><a href="/register">Register</a></li>
-              <li><a href="/signin">Sign In</a></li>
+              <li><a href="/login">Log In</a></li>
             </ul>
           </li>
         </ul>
