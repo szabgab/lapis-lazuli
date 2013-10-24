@@ -1,0 +1,14 @@
+<form method="POST">
+ <b>Title:</b><input name="title" id="title" /></br>
+ <b>Basename:</b><input name="basename" id="basename" /> Unlock: <input name="basename_lock" id="basename_lock" type="checkbox"></br>
+ <b>Abstract:</b><br>
+ <textarea name="abstract" rows="10" cols="80" /></textarea><br>
+ <b>Body:</b><br>
+ <textarea name="body" rows="10" cols="80" /></textarea><br>
+ <b>Tags:</b><input name="tags" /></br>
+ Status: <select name="status">
+  <option value="draft">Draft</option>
+  <option value="published">Published</option>
+ </select>
+ <input type="submit" value="Save" />
+</form>

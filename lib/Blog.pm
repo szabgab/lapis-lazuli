@@ -19,6 +19,11 @@ hook before => sub {
 	if (request->path ne '/setup' and not _site_exists()) {
 		redirect '/setup';
 	}
+
+	if (request->path =~ m{^/u/} and not logged_in()) {
+		redirect '/'; # TODO better handling of timeout
+	}
+
 };
 
 hook before_template => sub {
@@ -30,21 +35,17 @@ hook before_template => sub {
 		$t->{title} = $sites->next->{site_title};
 	}
 
-	my $TIMEOUT = 60;
-	if (session('last_seen')) {
-		if (session('last_seen') > time - $TIMEOUT) {
-			my $user_id = session('user_id');
-			my $users_coll = setting('db')->get_collection('users');
-			my $user  = $users_coll->find_one({ _id => $user_id });
-			$t->{display_name} = $user->{display_name};
-			session last_seen => time;
-		}
+	if (logged_in()) {
+		my $user_id = session('user_id');
+		my $users_coll = setting('db')->get_collection('users');
+		my $user  = $users_coll->find_one({ _id => $user_id });
+		$t->{display_name} = $user->{display_name};
 	}
 
 	return;
 };
 
-get '/' => sub {
+any ['get', 'post'] => '/' => sub {
 	template 'index';
 };
 
@@ -109,7 +110,7 @@ post '/login' => sub {
 	session user_id => $user_id->{_id};
 
 	#forward '/'; # cannot forward, probably because this is a POST and / is only defined for GET
-	#redirect '/'; # the cookie is not set!
+	#redirect '/', 303; # the cookie is not set!
 	template 'index'; # not nice, but it works for now
 };
 
@@ -118,7 +119,7 @@ get '/logout' => sub {
 	redirect '/';
 };
 
-get '/create-post' => sub {
+get '/u/create-post' => sub {
 	template 'editor';
 };
 
@@ -151,5 +152,14 @@ sub _site_exists {
 	return;
 }
 
+sub logged_in {
+	my $TIMEOUT = 24*60*60;
+
+	return if not session('last_seen');
+	return if session('last_seen') < time - $TIMEOUT;
+
+	session last_seen => time;
+	return 1;
+}
 
 true;
