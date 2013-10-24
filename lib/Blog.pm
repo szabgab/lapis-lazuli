@@ -28,6 +28,18 @@ hook before => sub {
 	}
 };
 
+hook before_template => sub {
+	my $t = shift;
+
+	if (_site_exists() and not $t->{title}) {
+		my $sites_coll = setting('db')->get_collection('sites');
+		my $sites  = $sites_coll->find();
+		$t->{title} = $sites->next->{site_title};
+	}
+
+	return;
+};
+
 get '/' => sub {
 	template 'index';
 };
