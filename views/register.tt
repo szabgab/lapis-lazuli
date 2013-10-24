@@ -1,26 +1,17 @@
-<div id="page">
-      <div id="sidebar">
-        <ul id="sidebar-items">
-        </ul>
-
-      </div>
-
-      <div id="content">
-        <div id="header">
-          <h1>Our Blog</h1>
-          <h2></h2>
-        <form method="POST">
-         <% IF setup_site %>
-           <b>Site title:</b><input name="site_title" /></br>
-         <% END %>
-         <b>Username:</b><input name="username" /></br>
-         <b>Display Name:</b><input name="display_name" /></br>
-         <b>Email Address:</b><input name="email_address" /></br>
-         <b>Initial Password:</b><input name="initial_password" type="password" /></br>
-         <b>Password Confirm:</b><input name="password_confirm" type="password" /></br>
-         <input type="submit" value="Register" />
-        </form>
-        </div>
-      </div>
-    </div>
+<div id="content">
+  <div id="header">
+    <h1>Our Blog</h1>
+    <h2></h2>
+  <form method="POST">
+   <% IF setup_site %>
+     <b>Site title:</b><input name="site_title" /></br>
+   <% END %>
+   <b>Username:</b><input name="username" /></br>
+   <b>Display Name:</b><input name="display_name" /></br>
+   <b>Email Address:</b><input name="email_address" /></br>
+   <b>Initial Password:</b><input name="initial_password" type="password" /></br>
+   <b>Password Confirm:</b><input name="password_confirm" type="password" /></br>
+   <input type="submit" value="Register" />
+  </form>
+  </div>
 </div>

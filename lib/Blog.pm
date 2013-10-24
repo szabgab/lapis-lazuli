@@ -118,6 +118,10 @@ get '/logout' => sub {
 	redirect '/';
 };
 
+get '/create-post' => sub {
+	template 'editor';
+};
+
 
 sub _check_new_user {
 	die 'Missing username' if not params->{username} or params->{username} !~ /^\w+$/;

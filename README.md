@@ -25,7 +25,7 @@ Registration:
 Sign in:
   Username:
   Password:
-  Rememebr me? (checkbox)
+  Rememeber me? (checkbox)
  "Sign In" button
 
   Link to "Sign Up"

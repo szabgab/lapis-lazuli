@@ -13,9 +13,28 @@
   /* ]]> */</script>
 </head>
 <body>
-  <% content %>
+  <div id="page">
+      <div id="sidebar">
+        <ul id="sidebar-items">
+          <li>
+            <h3>Join the community</h3>
+            <ul class="links">
+			  <% IF display_name %>
+                <li><% display_name %></li>
+                <li><a href="/logout">Log Out</a></li>
+                <li><a href="/create-post">Create Post</a></li>
+              <% ELSE %>
+                <li><a href="/register">Register</a></li>
+                <li><a href="/login">Log In</a></li>
+              <% END %>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    <% content %>
+  </div>
   <div id="footer">
-  Powered by <a href="http://perldancer.org/">Dancer2</a> <% dancer_version %>
+  Powered by Perl.
   </div>
 </body>
 </html>
