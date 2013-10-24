@@ -123,6 +123,10 @@ get '/u/create-post' => sub {
 	template 'editor';
 };
 
+post '/u/create-post' => sub {
+	return 1;	
+};
+
 
 sub _check_new_user {
 	die 'Missing username' if not params->{username} or params->{username} !~ /^\w+$/;
