@@ -16,10 +16,7 @@ hook before => sub {
 	set mongo_client => $client;
 	set db => $db;
 
-	#if (request->path ne '/setup' and not $data) {
 	if (request->path ne '/setup' and not _site_exists()) {
-		#request->path_info('/setup');
-		#forward '/setup';
 		redirect '/setup';
 	}
 };
@@ -31,6 +28,17 @@ hook before_template => sub {
 		my $sites_coll = setting('db')->get_collection('sites');
 		my $sites  = $sites_coll->find();
 		$t->{title} = $sites->next->{site_title};
+	}
+
+	my $TIMEOUT = 60;
+	if (session('last_seen')) {
+		if (session('last_seen') > time - $TIMEOUT) {
+			my $user_id = session('user_id');
+			my $users_coll = setting('db')->get_collection('users');
+			my $user  = $users_coll->find_one({ _id => $user_id });
+			$t->{display_name} = $user->{display_name};
+			session last_seen => time;
+		}
 	}
 
 	return;
@@ -61,6 +69,7 @@ post '/setup' => sub {
 	$site_title =~ s/^\s+|\s+$//g;
 	die 'Invalid site title' if not $site_title;
 	my $site_id = $sites_coll->insert({ site_title => $site_title });
+	# TODO without the quotes we get  huge and unusable stack trace
 	#die "$site_id";
 
 	$user_data->{admin} = 1;
@@ -95,7 +104,18 @@ post '/login' => sub {
 	my $users_coll = setting('db')->get_collection('users');
 	my $user_id    = $users_coll->find_one(\%user);
 	die "Could not authenticate" if not $user_id;
-	die "OK";
+
+	session last_seen => time;
+	session user_id => $user_id->{_id};
+
+	#forward '/'; # cannot forward, probably because this is a POST and / is only defined for GET
+	#redirect '/'; # the cookie is not set!
+	template 'index'; # not nice, but it works for now
+};
+
+get '/logout' => sub {
+	context->destroy_session;
+	redirect '/';
 };
 
 

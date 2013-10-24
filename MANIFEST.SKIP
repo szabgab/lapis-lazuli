@@ -14,5 +14,6 @@ Makefile$
 ^.*\.swp$
 MYMETA.*
 ^\.gitignore
+^sessions
 
 ^Blog-

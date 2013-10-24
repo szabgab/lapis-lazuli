@@ -4,8 +4,13 @@
           <li>
             <h3>Join the community</h3>
             <ul class="links">
-              <li><a href="/register">Register</a></li>
-              <li><a href="/login">Log In</a></li>
+			  <% IF display_name %>
+                <li><% display_name %></li>
+                <li><a href="/logout">Log Out</a></li>
+              <% ELSE %>
+                <li><a href="/register">Register</a></li>
+                <li><a href="/login">Log In</a></li>
+              <% END %>
             </ul>
           </li>
         </ul>
