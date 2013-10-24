@@ -20,6 +20,8 @@ WriteMakefile(
         'Test::More' => 0,
         'YAML'       => 0,
         'Dancer2'     => 0.10,
+        'MongoDB'     => '0.702',
+        #'Dancer2::Session::MongoDB' => '0.003',
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Blog-*' },
