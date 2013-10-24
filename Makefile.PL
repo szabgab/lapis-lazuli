@@ -9,9 +9,9 @@ $eumm_version =~ s/_//;
 
 WriteMakefile(
     NAME                => 'Blog',
-    AUTHOR              => q{YOUR NAME <youremail@example.com>},
+    AUTHOR              => q{Gabor Szabo <gabor@szabgab.com>},
     VERSION_FROM        => 'lib/Blog.pm',
-    ABSTRACT            => 'YOUR APPLICATION ABSTRACT',
+    ABSTRACT            => 'A Blog engine',
     ($eumm_version >= 6.3001
       ? ('LICENSE'=> 'perl')
       : ()),
@@ -21,6 +21,8 @@ WriteMakefile(
         'YAML'       => 0,
         'Dancer2'     => 0.10,
         'MongoDB'     => '0.702',
+        'Template'    => '2.25',
+        'Email::Valid' => '1.192',
         #'Dancer2::Session::MongoDB' => '0.003',
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
