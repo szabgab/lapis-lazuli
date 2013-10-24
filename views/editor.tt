@@ -1,10 +1,14 @@
 
 <hr>
-<h2>Create Post</h2>
+<% IF page.basename %>
+   <h2>Edit Post</h2>
+<% ELSE %>
+   <h2>Create Post</h2>
+<% END %>
 
 <form id="post_form" method="POST">
- <b>Title:</b><input name="title" id="title" /></br>
- <b>Basename:</b><input name="basename" id="basename" /> Unlock: <input name="basename_lock" id="basename_lock" type="checkbox"></br>
+ <b>Title:</b><input name="title" id="title" value="<% page.title %>" /></br>
+ <b>Basename:</b><input name="basename" id="basename" value="<% page.basename %>" /> Unlock: <input name="basename_lock" id="basename_lock" type="checkbox"></br>
  <b>Abstract:</b><br>
  <textarea name="abstract" rows="10" cols="80" /></textarea><br>
  <b>Body:</b><br>

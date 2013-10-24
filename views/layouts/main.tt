@@ -30,6 +30,7 @@
               <li><% display_name %></li>
               <li><a href="/logout">Log Out</a></li>
               <li><a href="/u/create-post">Create Post</a></li>
+              <li><a href="/u/list-posts">List Posts</a></li>
             <% ELSE %>
               <li><a href="/register">Register</a></li>
               <li><a href="/login">Log In</a></li>

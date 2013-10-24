@@ -32,6 +32,12 @@ $(document).ready(function() {
 	});
 	$("#submit").click(function() {
 		var data = $("#post_form").serialize();
+		//console.log('hi');
+
+		// It seems serialize does not fetch the value of disabled fields
+		//console.log(data.title);
+		data += "&basename=" + $("#basename").val();
+		//console.log(data);
 		$.post("/u/create-post", data, function() {
 			console.log('success');
 		}).fail(function() {

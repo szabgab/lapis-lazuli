@@ -120,11 +120,49 @@ get '/logout' => sub {
 };
 
 get '/u/create-post' => sub {
+	my $id = params->{id};
+	if ($id) {
+		my $pages_coll = setting('db')->get_collection('pages');
+		my $page  = $pages_coll->find_one({ _id => MongoDB::OID->new(value => $id) });
+		die "Could not find page for id '$id'" if not $page;
+		if ($page->{author_id} ne session('user_id')) {
+			die "You cannot edit someone elses page!";
+		}
+		return template 'editor', { page => $page };
+	}
 	template 'editor';
 };
 
 post '/u/create-post' => sub {
+	# TODO check parameter
+#die params->{basename};
+	my %data = map { $_ => params->{$_} } qw(title basename abstract body status);
+	my $tags = params->{tags};
+	if ($tags) {
+		$data{tags} = [ map { s{^\s+|\s+$}{}; $_ } split /,/, $tags ];
+	}
+
+	# TODO: add published_timestamp, updated_timestamp
+	$data{author_id} = session('user_id');
+
+	# update?
+	# params->{id};
+	# make sure basename is unique for the path it will be displayed
+	# at
+	# display: user_yyyy_mm   (there could be other strategies)
+	# fetch all the pages with the same basename and check the full path of each one of them.
+
+	my $pages_coll = setting('db')->get_collection('pages');
+	my $page_id = $pages_coll->insert( \%data );
 	return 1;	
+};
+
+get '/u/list-posts' => sub {
+	my $pages_coll = setting('db')->get_collection('pages');
+	my $all_pages = $pages_coll->find( { author_id => session('user_id') } );
+	#die Dumper $all_pages;
+
+	template 'list_pages', {pages => [map {$_->{id} = $_->{_id}; $_ } $all_pages->all]};
 };
 
 

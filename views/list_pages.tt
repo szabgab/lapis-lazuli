@@ -1,0 +1,11 @@
+<table>
+<% FOR p IN pages %>
+  <% FOR k IN p.keys %>
+  <% k %>
+  <% END %>
+  <tr><td><% p.title %></td>
+      <td><% p.status %></td>
+      <td><a href="/u/create-post?id=<% p.id %>">edit</a></td>
+  </tr>
+<% END %>
+</table>
