@@ -23,6 +23,7 @@ WriteMakefile(
         'MongoDB'     => '0.702',
         'Template'    => '2.25',
         'Email::Valid' => '1.192',
+        'Digest::SHA'  => '5.85',
         #'Dancer2::Session::MongoDB' => '0.003',
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
