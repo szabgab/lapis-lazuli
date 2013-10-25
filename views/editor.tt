@@ -15,8 +15,8 @@
  <textarea name="body" rows="10" cols="80" /><% page.body %></textarea><br>
  <b>Tags:</b><input name="tags" id="tags" value="<% page.tags %>" /></br>
  Status: <select name="status" id="status">
-  <option value="draft">Draft</option>
-  <option value="published">Published</option>
+  <option value="draft" <% IF page.status == 'draft' %>selected="SELECTED"<% END %> >Draft</option>
+  <option value="published" <% IF page.status == 'published' %>selected="SELECTED"<% END %> >Published</option>
  </select>
  <input type="hidden" name="id"  value="<% page.id %>" />
  <input type="button" id="submit" value="Save" />
