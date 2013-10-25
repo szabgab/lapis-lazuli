@@ -88,3 +88,13 @@ code, tt {
   font-family: sans-serif;
   font-size: 10px;
 }
+
+.admin {
+  background-color: red;
+}
+
+th {
+  font-weight: bold;
+}
+
+

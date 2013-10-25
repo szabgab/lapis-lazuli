@@ -1,9 +1,3 @@
-<style>
-#internal_listing th {
-  font-weight: bold;
-}
-</style>
-
 <div id="internal_listing">
 <table>
 <tr>
@@ -14,11 +8,12 @@
    <th>Action</th>
 </tr>
 <% FOR p IN pages %>
-  <tr><td><% p.title %></td>
-      <td><% p.status %></td>
-      <td><% p.author_id %></td>
-      <td><% p.create_timestamp %></td>
-      <td><a href="/u/create-post?id=<% p.id %>">edit</a></td>
+  <tr>
+    <td><% p.title %></td>
+    <td><% p.status %></td>
+    <td><% p.author_id %></td>
+    <td><% p.create_timestamp %></td>
+    <td><a href="/u/create-post?id=<% p.id %>">edit</a></td>
   </tr>
 <% END %>
 </table>

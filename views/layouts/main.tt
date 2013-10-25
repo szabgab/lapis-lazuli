@@ -26,8 +26,8 @@
         <li>
           <h3>Join the community</h3>
           <ul class="links">
-	  	  <% IF display_name %>
-              <li><% display_name %></li>
+	  	    <% IF user.display_name %>
+              <li><% user.display_name %></li>
               <li><a href="/logout">Log Out</a></li>
               <li><a href="/u/create-post">Create Post</a></li>
               <li><a href="/u/list-posts">List Posts</a></li>
@@ -36,6 +36,12 @@
               <li><a href="/login">Log In</a></li>
             <% END %>
           </ul>
+          <% IF user.admin %>
+            <ul class="links admin">
+              <li>Administrator tools</li>
+              <li><a href="/a/list-users">List Users</a></li>
+            </ul>
+          <% END %>
         </li>
       </ul>
     </div>

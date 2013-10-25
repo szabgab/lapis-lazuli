@@ -39,7 +39,8 @@ hook before_template => sub {
 		my $user_id = session('user_id');
 		my $users_coll = setting('db')->get_collection('users');
 		my $user  = $users_coll->find_one({ _id => $user_id });
-		$t->{display_name} = $user->{display_name};
+		$t->{user}{display_name} = $user->{display_name};
+		$t->{user}{admin} = $user->{admin};
 	}
 
 	return;
@@ -185,9 +186,16 @@ post '/u/create-post' => sub {
 get '/u/list-posts' => sub {
 	my $pages_coll = setting('db')->get_collection('pages');
 	my $all_pages = $pages_coll->find( { author_id => session('user_id') } );
-	#die Dumper $all_pages;
 
 	template 'list_pages', {pages => [map {$_->{id} = $_->{_id}; $_ } $all_pages->all]};
+};
+
+
+get '/a/list-users' => sub {
+	my $users_coll = setting('db')->get_collection('users');
+	my $all_users = $users_coll->find();
+
+	template 'list_users', {users => [map {$_->{id} = $_->{_id}; $_ } $all_users->all]};
 };
 
 
@@ -206,6 +214,8 @@ sub _check_new_user {
 		username     => params->{username},
 		display_name => params->{display_name},
 		password     => sha1_base64(params->{initial_password}),
+		email        => [],
+		registration_ts => time,
 	);
 	return \%user;
 }
