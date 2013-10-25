@@ -130,32 +130,51 @@ get '/u/create-post' => sub {
 		if ($page->{author_id} ne session('user_id')) {
 			die "You cannot edit someone elses page!";
 		}
+		$page->{id} = $page->{_id};
 		return template 'editor', { page => $page };
 	}
 	template 'editor';
 };
 
 post '/u/create-post' => sub {
-	# TODO check parameter
-#die params->{basename};
-	my %data = map { $_ => params->{$_} } qw(title basename abstract body status);
-	my $tags = params->{tags};
-	if ($tags) {
-		$data{tags} = [ map { s{^\s+|\s+$}{}; $_ } split /,/, $tags ];
-	}
+	# TODO check parameters
 
-	# TODO: add published_timestamp, updated_timestamp
-	$data{author_id} = session('user_id');
-
-	# update?
-	# params->{id};
+	# TODO:
 	# make sure basename is unique for the path it will be displayed
 	# at
 	# display: user_yyyy_mm   (there could be other strategies)
 	# fetch all the pages with the same basename and check the full path of each one of them.
 
+
 	my $pages_coll = setting('db')->get_collection('pages');
-	my $page_id = $pages_coll->insert( \%data );
+
+	my %data;
+	# TODO: updated_timestamp
+	my $page_id = params->{id};
+	my $user_id = session('user_id');
+	if ($page_id) {
+		my $page  = $pages_coll->find_one({ _id => MongoDB::OID->new(value => $page_id) });
+		die "This is someone elses post!" if $page->{author_id} ne $user_id;
+	}
+
+	%data = map { $_ => params->{$_} } qw(title basename abstract body status);
+	my $tags = params->{tags};
+	if ($tags) {
+		$data{tags} = [ map { s{^\s+|\s+$}{}; $_ } split /,/, $tags ];
+	}
+
+	if ($page_id) {
+		$pages_coll->update({ _id => $page_id}, \%data);
+		return 1;
+	}
+
+	# TODO: add published_timestamp
+	# TODO: add created_timestamp
+
+	# New post
+	$data{author_id} = $user_id;
+
+	$page_id = $pages_coll->insert( \%data );
 	return 1;	
 };
 

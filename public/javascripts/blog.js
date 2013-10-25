@@ -40,8 +40,10 @@ $(document).ready(function() {
 		//console.log(data);
 		$.post("/u/create-post", data, function() {
 			console.log('success');
+			alert('success');
 		}).fail(function() {
 			console.log('fail');
+			alert('fail');
 		});
 	});
 });

@@ -18,5 +18,6 @@
   <option value="draft">Draft</option>
   <option value="published">Published</option>
  </select>
+ <input type="hidden" name="id"  value="<% page.id %>" />
  <input type="button" id="submit" value="Save" />
 </form>
