@@ -46,7 +46,9 @@ hook before_template => sub {
 };
 
 any ['get', 'post'] => '/' => sub {
-	template 'index';
+	my $pages_coll = setting('db')->get_collection('pages');
+	my $all_pages = $pages_coll->find( { status => 'published' } );
+	template 'index', {pages => [map {$_->{id} = $_->{_id}; $_ } $all_pages->all]};
 };
 
 get '/register' => sub {

@@ -1,1 +1,14 @@
-Content
+<% UNLESS pages.size %>
+No posts yet
+<% END %>
+<% FOR p in pages %>
+  <div class="main_post">
+    <h2><% p.title %></h2>
+    <div class="abstract">
+      <% p.abstract %>
+    </div>
+    <a href=""><% p.number_of_comments %> comments</a> 
+    <a href=""><% IF p.body %>Continue reading<% ELSE %>Permalink<% END %></a>
+  </div>
+
+<% END %>
