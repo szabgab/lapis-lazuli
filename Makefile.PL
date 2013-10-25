@@ -22,6 +22,7 @@ WriteMakefile(
         'Dancer2'     => 0.10,
         'MongoDB'     => '0.702',
         'Template'    => '2.25',
+		'Email::Sender' => '1.300006',
         'Email::Valid' => '1.192',
         'Digest::SHA'  => '5.85',
         #'Dancer2::Session::MongoDB' => '0.003',

@@ -1,0 +1,8 @@
+<% IF just_registered  %>
+Thank you for registering.<br>
+You can already log in and post your first article, but to be a good citizen
+we would like to ask you to verify your e-mail address.
+<p>
+We have sent you a message with a link. Clicking on that link will verify
+that the e-mail address belongs to you.
+<% END %>

@@ -7,6 +7,8 @@ use Digest::SHA qw(sha1_base64);
 use Email::Valid ();
 use MongoDB ();
 
+use Blog::Email;
+
 our $VERSION = '0.1';
 
 hook before => sub {
@@ -15,6 +17,8 @@ hook before => sub {
 	my $db   = $client->get_database( 'ourblog' );
 	set mongo_client => $client;
 	set db => $db;
+
+	set email => Blog::Email->new(url => request->uri_base);
 
 	if (request->path ne '/setup' and not _site_exists()) {
 		redirect '/setup';
@@ -89,7 +93,10 @@ post '/register' => sub {
 	my $users_coll = setting('db')->get_collection('users');
 	my $user_id    = $users_coll->insert($user_data);
 
-	redirect '/';
+	setting('email')->send_validation_code(%$user_data, id => "$user_id" );
+
+	template 'message', { 'just_registered' => 1 };
+	#redirect '/';
 };
 
 
@@ -216,9 +223,20 @@ sub _check_new_user {
 		password     => sha1_base64(params->{initial_password}),
 		email        => [],
 		registration_ts => time,
+		email_validation_address => $email,
+		email_validation_code => _generate_code(),
+		email_validation_ts => time,
 	);
 	return \%user;
 }
+
+sub _generate_code {
+	my @chars = ('a' .. 'z', 'A' .. 'Z', 0 .. 9);
+	my $code = '';
+	$code .= $chars[ int rand scalar @chars ] for 1..20;
+	return $code;
+}
+
 
 sub _site_exists {
 	my $sites_coll = setting('db')->get_collection('sites');

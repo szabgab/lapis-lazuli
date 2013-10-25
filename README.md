@@ -1,7 +1,28 @@
 
 
-
 http://en.wikipedia.org/wiki/Lapis_lazuli
+
+
+TODO
+=====
+
+- make sure an e-mail address can only belong to one user
+- make sure the username is unique
+
+- allow the user to change display name and password
+  and to have several e-mail addresses on file, with one of them being the 
+  primary address.
+  (the list of e-mail addresses might need to be an array of hashes
+  {
+    email => 'joe@example.com',
+    verified => True/False,
+    verify_code => 'adasa',  # until it gets verified
+    submitted_ts => time, # so we can remove e-mails that were not verified for a long time
+  }
+
+
+
+
 
 
 Specification
