@@ -6,3 +6,7 @@ we would like to ask you to verify your e-mail address.
 We have sent you a message with a link. Clicking on that link will verify
 that the e-mail address belongs to you.
 <% END %>
+
+<% IF require_admin_login %>
+You need to be logged in as an administrator in order to access this page.
+<% END %>

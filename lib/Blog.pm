@@ -28,6 +28,17 @@ hook before => sub {
 		redirect '/'; # TODO better handling of timeout
 	}
 
+	if (request->path =~ m{^/a/}) {
+		if (not logged_in()) {
+			return forward '/message/require_admin_login';
+		}
+		my $user_id = session('user_id');
+		my $users_coll = setting('db')->get_collection('users');
+		my $user  = $users_coll->find_one({ _id => $user_id });
+		if (not $user->{admin}) {
+			return forward '/message/require_admin_login';
+		}
+	}
 };
 
 hook before_template => sub {
@@ -48,6 +59,10 @@ hook before_template => sub {
 	}
 
 	return;
+};
+
+get '/message/:code' => sub {
+	template 'message', { params->{code} => 1 };
 };
 
 any ['get', 'post'] => '/' => sub {
