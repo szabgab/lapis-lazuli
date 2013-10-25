@@ -131,6 +131,9 @@ get '/u/create-post' => sub {
 			die "You cannot edit someone elses page!";
 		}
 		$page->{id} = $page->{_id};
+		if ($page->{tags}) {
+			$page->{tags} = join ', ', @{ $page->{tags} };
+		}
 		return template 'editor', { page => $page };
 	}
 	template 'editor';
@@ -155,16 +158,17 @@ post '/u/create-post' => sub {
 	if ($page_id) {
 		my $page  = $pages_coll->find_one({ _id => MongoDB::OID->new(value => $page_id) });
 		die "This is someone elses post!" if $page->{author_id} ne $user_id;
+		%data = %$page;
 	}
 
-	%data = map { $_ => params->{$_} } qw(title basename abstract body status);
+	$data{$_} = params->{$_} for qw(title basename abstract body status);
 	my $tags = params->{tags};
 	if ($tags) {
 		$data{tags} = [ map { s{^\s+|\s+$}{}; $_ } split /,/, $tags ];
 	}
 
 	if ($page_id) {
-		$pages_coll->update({ _id => $page_id}, \%data);
+		$pages_coll->update({ _id => MongoDB::OID->new(value => $page_id)}, \%data);
 		return 1;
 	}
 
