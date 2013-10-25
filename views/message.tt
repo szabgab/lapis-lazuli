@@ -10,3 +10,9 @@ that the e-mail address belongs to you.
 <% IF require_admin_login %>
 You need to be logged in as an administrator in order to access this page.
 <% END %>
+
+<% IF user_deleted %>
+User has been deleted
+<% END %>
+
+

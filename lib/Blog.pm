@@ -220,6 +220,32 @@ get '/a/list-users' => sub {
 	template 'list_users', {users => [map {$_->{id} = $_->{_id}; $_ } $all_users->all]};
 };
 
+get '/a/user' => sub {
+	my $user_id = params->{id};
+	my $users_coll = setting('db')->get_collection('users');
+	my $user  = $users_coll->find_one({ _id => MongoDB::OID->new(value => $user_id) });
+	$user->{id} = "$user->{_id}";
+
+	my $pages_coll = setting('db')->get_collection('pages');
+	my $all_pages = $pages_coll->find( { author_id => $user_id } );
+	template 'admin_user', {
+		the_user => $user,
+		pages => [map {$_->{id} = $_->{_id}; $_ } $all_pages->all],
+	};
+};
+
+get '/a/delete-user' => sub {
+	my $user_id = params->{id};
+	my $users_coll = setting('db')->get_collection('users');
+	my $user  = $users_coll->find_one({ _id => MongoDB::OID->new(value => $user_id) });
+	my $ret = $users_coll->remove({ _id => MongoDB::OID->new(value => $user_id) });
+	#die Dumper $ret;
+	#die "Could not find user" if not $user;
+	#die Dumper $user;
+	#$user->delete;
+	template 'message', { user_deleted => 1 };
+};
+
 
 sub _check_new_user {
 	die 'Missing username' if not params->{username} or params->{username} !~ /^\w+$/;

@@ -19,7 +19,16 @@ TODO
     verify_code => 'adasa',  # until it gets verified
     submitted_ts => time, # so we can remove e-mails that were not verified for a long time
   }
-
+- When deleting a user ask for confirmation
+  and remove all the posts and comments the user made.
+- Allow disabling users (by administrators)
+- Add an audit trail with events:
+    {
+      user => id,
+      what => 'registered' / deleted / enabled / disabled / etc
+      the subject => user_id | post_id | etc..
+      ts => time,
+    }
 
 
 

@@ -2,15 +2,15 @@
 <tr>
    <th>Name</th>
    <th>Username</th>
-   <th>Email</th>
    <th>Administrator?</th>
+   <th>Details</th>
 </tr>
 <% FOR u IN users %>
   <tr>
     <td><% u.display_name %></td>
     <td><% u.username %></td>
-    <td><% u.email %></td>
     <td><% u.admin %></td>
+    <td><a href="/a/user?id=<% u.id %>">show</a></td>
   </tr>
 <% END %>
 </table>

@@ -1,0 +1,21 @@
+id <% the_user.id %><br>
+display_name: <% the_user.display_name %><br>
+username: <% the_user.username %><br>
+
+<h2>Posts</h2>
+<% IF posts.size %>
+  <ul>
+  <% FOR p IN posts %>
+    <li><% p.title %></li>
+  <% END %>
+  </ul>
+<% ELSE %>
+This user did not have anyposts
+<% END %>
+
+<h2>Comments</h2>
+???
+
+<p>
+<a href="/a/delete-user?id=<% the_user.id %>">delete user</a>
+
