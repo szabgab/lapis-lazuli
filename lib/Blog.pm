@@ -116,10 +116,13 @@ post '/register' => sub {
 	my $users_coll = setting('db')->get_collection('users');
 	my $user_id    = $users_coll->insert($user_data);
 
-	setting('email')->send_validation_code(%$user_data, id => "$user_id" );
+	setting('email')->send_validation_code(
+		email => $user_data->{emails}[0],
+		id   => "$user_id",
+		name => $user_data->{display_name},
+	);
 
 	template 'message', { 'just_registered' => 1 };
-	#redirect '/';
 };
 
 
@@ -297,7 +300,6 @@ get '/a/delete-user' => sub {
 
 sub _check_new_user {
 	die 'Missing username' if not params->{username} or params->{username} !~ /^\w+$/;
-	#die 'Missing Display name' if not params->{display_name} or params->{display_name} !~ /\S/;
 	die 'Missing email' if not params->{email_address};
 	my $supplied_email = lc params->{email_address};
 	$supplied_email =~ s/^\s+|\s+$//g;
@@ -306,15 +308,20 @@ sub _check_new_user {
 	die 'Missing password' if not params->{initial_password} or not params->{password_confirm};
 	die 'Passwords differ' if params->{initial_password} ne params->{password_confirm};
 
+	my $now = time;
+
 	my %user = (
 		username     => params->{username},
-		#display_name => params->{display_name},
+		display_name => (params->{display_name} || params->{username}),
 		password     => sha1_base64(params->{initial_password}),
-		email        => [],
-		registration_ts => time,
-		email_validation_address => $email,
-		email_validation_code => _generate_code(),
-		email_validation_ts => time,
+		emails        => [ {
+			email    => $email,
+			verified => boolean::false,
+			verify_code => _generate_code(),
+			submitted_ts => $now,
+			# so we can remove e-mails that were not verified for a long time
+		}],
+		registration_ts => $now,
 	);
 	return \%user;
 }

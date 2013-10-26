@@ -10,9 +10,12 @@ use Blog::Email;
 my $email = Blog::Email->new(url => 'http://example.com');
 
 $email->send_validation_code(
-     email_validation_address => 'szabgab@gmail.com',
-     email_validation_code    => 'somelongstring',
-     id => '1234',
+	email => {
+		email => 'szabgab@gmail.com',
+		verify_code    => 'somelongstring',
+	},
+	id => '1234',
+	name => 'Foo Bar',
   );
 
 

@@ -13,12 +13,6 @@ TODO
   and to have several e-mail addresses on file, with one of them being the 
   primary address.
   (the list of e-mail addresses might need to be an array of hashes
-  {
-    email => 'joe@example.com',
-    verified => True/False,
-    verify_code => 'adasa',  # until it gets verified
-    submitted_ts => time, # so we can remove e-mails that were not verified for a long time
-  }
 - When deleting a user ask for confirmation
   and remove all the posts and comments the user made.
 - Allow disabling users (by administrators)
