@@ -1,10 +1,10 @@
 <h2>Edit Porfile</h2>
 
- <b>Username:</b><% the_user.username %></br>
 
 <form method="POST">
- <b>Display Name:</b><input name="display_name" /></br>
- <b>Password:</b><input name="password" type="password" /></br>
+ <b>Username:</b><input name="username" value="<% the_user.username %>" ></br>
+ <b>Display Name:</b><input name="display_name" value="<% the_user.display_name %>" /></br>
+ <b>New Password:</b><input name="new_password" type="password" /></br>
  <b>Password Confirm:</b><input name="password_confirm" type="password" /></br>
  <input type="submit" value="Update" />
 </form>
