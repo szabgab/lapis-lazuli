@@ -239,6 +239,21 @@ post '/u/edit-profile' => sub {
 	template 'message', { profile_updated => 1 };
 };
 
+get '/users/:username/:page' => sub {
+	my $username = params->{username};
+	my $page = params->{page};
+	if ($page eq 'profile') {
+		my $users_coll = setting('db')->get_collection('users');
+		my $user  = $users_coll->find_one({ username => $username });
+		if (not $user) {
+			return template 'message', { no_such_username => 1 };
+		}
+
+		return template 'profile', { the_user => $user };
+	}
+	die 'Not implemented';
+};
+
 
 get '/a/list-users' => sub {
 	my $users_coll = setting('db')->get_collection('users');

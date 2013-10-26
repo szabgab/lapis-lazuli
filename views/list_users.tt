@@ -4,6 +4,7 @@
    <th>Username</th>
    <th>Administrator?</th>
    <th>Details</th>
+   <th>Public</th>
 </tr>
 <% FOR u IN users %>
   <tr>
@@ -11,6 +12,7 @@
     <td><% u.username %></td>
     <td><% u.admin %></td>
     <td><a href="/a/user?id=<% u.id %>">show</a></td>
+    <td><a href="/users/<% u.username %>/profile">view</a></td>
   </tr>
 <% END %>
 </table>

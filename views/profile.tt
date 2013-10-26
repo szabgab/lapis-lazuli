@@ -1,0 +1,11 @@
+<h2><% the_user.username %></h2>
+
+
+<b>Username:</b> <% the_user.username %></br>
+<b>Display Name:</b><% the_user.display_name %></br>
+<b>Website:</b><br>
+<b>About:</b><br>
+
+<h2>Recent Actions</h2>
+
+

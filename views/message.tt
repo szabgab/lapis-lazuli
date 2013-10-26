@@ -29,3 +29,7 @@ User has been deleted
 Profile was updated
 <% END %>
 
+<% IF no_such_username %>
+No such username
+<% END %>
+
