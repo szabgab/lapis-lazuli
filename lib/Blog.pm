@@ -228,13 +228,19 @@ get '/u/edit-profile' => sub {
 	template 'edit-profile', { the_user => $user };
 };
 post '/u/edit-profile' => sub {
-	my $display_name = params->{display_name};
+	my %data = (
+		username     => params->{username},
+		display_name => params->{display_name},
+		website      => params->{website},
+		about        => params->{about},
+	);
+
 	#die if not $display_name or $display_name !~ /\S/;
 
 	my $user_id = session('user_id');
 	my $users_coll = setting('db')->get_collection('users');
 	$users_coll->update({ _id => MongoDB::OID->new(value => "$user_id") },
-		{ '$set' => { display_name => $display_name } },
+		{ '$set' => \%data },
 	);
 	template 'message', { profile_updated => 1 };
 };

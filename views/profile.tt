@@ -1,10 +1,11 @@
-<h2><% the_user.username %></h2>
+<h2><% the_user.display_name %></h2>
 
 
 <b>Username:</b> <% the_user.username %></br>
 <b>Display Name:</b><% the_user.display_name %></br>
-<b>Website:</b><br>
+<b>Website:</b><a href="<% the_user.website %>"><% the_user.website %></a><br>
 <b>About:</b><br>
+<% the_user.about %>
 
 <h2>Recent Actions</h2>
 

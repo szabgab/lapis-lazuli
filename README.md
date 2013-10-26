@@ -79,6 +79,7 @@ Edit Profile:
   Username cannot be changed
   Display Name:
   Email address:
+  Website
   New Password:
   Confirm Password:
   Userpic (Browse to upload)
