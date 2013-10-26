@@ -1,3 +1,13 @@
+<% IF welcome %>
+Congratulations. You've finished setting up the web site.
+<p>
+Did you expect more steps?
+<p>
+Sorry to disappoint...
+<p>
+Now you can log in and start creating pages.
+<% END %>
+
 <% IF just_registered  %>
 Thank you for registering.<br>
 You can already log in and post your first article, but to be a good citizen

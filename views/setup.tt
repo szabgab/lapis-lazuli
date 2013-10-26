@@ -1,0 +1,13 @@
+<% IF setup_site %>
+<h2>Welcome</h2>
+Welcome to the installation tool.
+In order to get started you need to provide some minimal information
+that includes the title of the site, and details of the first user.
+<p>
+Don't worry though you will be able to easily change every piece of
+information. 
+<p>
+<% END %>
+
+<% INCLUDE incl/registration_form.tt %>
+

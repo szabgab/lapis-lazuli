@@ -21,6 +21,7 @@
       <% content %>
     </div>
 
+    <% IF show_sidebar %>
     <div id="sidebar">
       <ul id="sidebar-items">
         <li>
@@ -46,6 +47,7 @@
         </li>
       </ul>
     </div>
+    <% END %>
   </div>
   <div id="footer">
   Powered by Perl.

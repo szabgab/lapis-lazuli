@@ -20,8 +20,11 @@ hook before => sub {
 
 	set email => Blog::Email->new(url => request->uri_base);
 
-	if (request->path ne '/setup' and not _site_exists()) {
-		redirect '/setup';
+	if (not _site_exists()) {
+		my $path = request->path;
+		if ($path ne '/setup' and $path !~ m{^(/css/)} ) {
+			redirect '/setup';
+		}
 	}
 
 	if (request->path =~ m{^/u/} and not logged_in()) {
@@ -54,8 +57,12 @@ hook before_template => sub {
 		my $user_id = session('user_id');
 		my $users_coll = setting('db')->get_collection('users');
 		my $user  = $users_coll->find_one({ _id => $user_id });
-		$t->{user}{display_name} = $user->{display_name};
+		$t->{user}{display_name} = $user->{display_name} || $user->{username};
 		$t->{user}{admin} = $user->{admin};
+	}
+
+	unless (request->path =~ m{^/setup}) {
+		$t->{show_sidebar} = 1;
 	}
 
 	return;
@@ -78,7 +85,7 @@ get '/register' => sub {
 get '/setup' => sub {
 	redirect '/' if _site_exists();
 
-	template 'register', {setup_site => 1};
+	template 'setup', {setup_site => 1};
 };
 
 post '/setup' => sub {
@@ -99,7 +106,8 @@ post '/setup' => sub {
 	my $users_coll = setting('db')->get_collection('users');
 	my $user_id    = $users_coll->insert($user_data);
 
-	redirect '/';
+	template 'message', { welcome => 1, show_sidebar => 1 };
+	#redirect '/';
 };
 
 post '/register' => sub {
@@ -268,7 +276,7 @@ get '/a/delete-user' => sub {
 
 sub _check_new_user {
 	die 'Missing username' if not params->{username} or params->{username} !~ /^\w+$/;
-	die 'Missing Display name' if not params->{display_name} or params->{display_name} !~ /\S/;
+	#die 'Missing Display name' if not params->{display_name} or params->{display_name} !~ /\S/;
 	die 'Missing email' if not params->{email_address};
 	my $supplied_email = lc params->{email_address};
 	$supplied_email =~ s/^\s+|\s+$//g;
@@ -279,7 +287,7 @@ sub _check_new_user {
 
 	my %user = (
 		username     => params->{username},
-		display_name => params->{display_name},
+		#display_name => params->{display_name},
 		password     => sha1_base64(params->{initial_password}),
 		email        => [],
 		registration_ts => time,
