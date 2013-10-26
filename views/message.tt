@@ -15,4 +15,7 @@ You need to be logged in as an administrator in order to access this page.
 User has been deleted
 <% END %>
 
+<% IF profile_updated %>
+Profile was updated
+<% END %>
 

@@ -212,6 +212,25 @@ get '/u/list-posts' => sub {
 	template 'list_pages', {pages => [map {$_->{id} = $_->{_id}; $_ } $all_pages->all]};
 };
 
+get '/u/edit-profile' => sub {
+	my $user_id = session('user_id');
+	my $users_coll = setting('db')->get_collection('users');
+	my $user  = $users_coll->find_one({ _id => MongoDB::OID->new(value => "$user_id") });
+	$user->{id} = "$user->{_id}";
+	template 'edit-profile', { the_user => $user };
+};
+post '/u/edit-profile' => sub {
+	my $display_name = params->{display_name};
+	die if not $display_name or $display_name !~ /\S/;
+
+	my $user_id = session('user_id');
+	my $users_coll = setting('db')->get_collection('users');
+	$users_coll->find_and_modify({ _id => MongoDB::OID->new(value => "$user_id") },
+		{ display_name => $display_name },
+	);
+	template 'message', { profile_updated => 1 };
+};
+
 
 get '/a/list-users' => sub {
 	my $users_coll = setting('db')->get_collection('users');
