@@ -33,3 +33,11 @@ Profile was updated
 No such username
 <% END %>
 
+<% IF email_verified %>
+Email verified. Thank you!
+<% END %>
+
+<% IF could_not_verify_email %>
+Could not verify the e-mail address.
+<% END %>
+

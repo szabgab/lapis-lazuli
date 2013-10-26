@@ -2,6 +2,23 @@ id <% the_user.id %><br>
 display_name: <% the_user.display_name %><br>
 username: <% the_user.username %><br>
 
+<h2>Emails:</h2>
+<table>
+<tr>
+ <th>email</th>
+ <th>Verified</th>
+ <th>Submit date</th>
+</tr>
+<% FOR e IN the_user.emails %>
+ <tr>
+   <td><% e.email %></td>
+   <td><% e.verified %></td>
+   <td><% e.submitted_ts %></td>
+ </tr>
+<% END %>
+</table>
+
+
 <h2>Posts</h2>
 <% IF posts.size %>
   <ul>

@@ -150,6 +150,29 @@ post '/login' => sub {
 	template 'index'; # not nice, but it works for now
 };
 
+get '/validate-email/:id/:code' => sub {
+	my $user_id = params->{id};
+	my $validation_code = params->{code};
+
+	my $users_coll = setting('db')->get_collection('users');
+	my $res = $users_coll->update({
+			_id => MongoDB::OID->new(value => $user_id),
+			emails => {
+				'$elemMatch' => { verify_code => $validation_code }, 
+			}
+		},
+		{
+			'$set' => { 'emails.$.verified' => boolean::true }, 
+			'$unset' => { 'emails.$.verify_code' => '' },
+		});
+	#die Dumper $res;
+	if ($res->{updatedExisting}) {
+		template 'message', { email_verified => 1 };
+	} else {
+		template 'message', { could_not_verify_email => 1 };
+	}
+};
+
 get '/logout' => sub {
 	context->destroy_session;
 	redirect '/';
