@@ -12,6 +12,12 @@ use Blog::Audit;
 
 our $VERSION = '0.1';
 
+#hook on_route_exception => sub {
+#	my ($context, $error) = @_;
+#	forward '/';
+#	return;
+#};
+
 hook before => sub {
 	# TODO get this from the configuration file
 	set db => Blog::DB->instance(host => 'localhost:27017', database => 'ourblog')->db;
@@ -121,6 +127,15 @@ post '/register' => sub {
 	my $user_data = _check_new_user();
 
 	my $users_coll = setting('db')->get_collection('users');
+	my $u = $users_coll->find_one({ username => $user_data->{username} });
+	if ($u) {
+		die "Username already taken";
+	}
+	my $u = $users_coll->find_one({ 'emails.email' => $user_data->{emails}[0]{email} });
+	if ($u) {
+		die "Email already used";
+	}
+
 	my $user_id;
 	my $user_id    = $users_coll->insert($user_data);
 	Blog::Audit->save(
