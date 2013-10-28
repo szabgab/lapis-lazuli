@@ -5,18 +5,15 @@ use Dancer2;
 use Data::Dumper qw(Dumper);
 use Digest::SHA qw(sha1_base64);
 use Email::Valid ();
-use MongoDB ();
 
 use Blog::Email;
+use Blog::DB;
 
 our $VERSION = '0.1';
 
 hook before => sub {
 	# TODO get this from the configuration file
-	my $client = MongoDB::MongoClient->new(host => 'localhost', port => 27017);
-	my $db   = $client->get_database( 'ourblog' );
-	set mongo_client => $client;
-	set db => $db;
+	set db => Blog::DB->instance(host => 'localhost:27017', database => 'ourblog')->db;
 
 	set email => Blog::Email->new(url => request->uri_base);
 
@@ -104,6 +101,7 @@ post '/setup' => sub {
 
 	$user_data->{admin} = 1;
 	my $users_coll = setting('db')->get_collection('users');
+#	$users_coll->
 	my $user_id    = $users_coll->insert($user_data);
 
 	template 'message', { welcome => 1, show_sidebar => 1 };
@@ -115,6 +113,7 @@ post '/register' => sub {
 
 	my $users_coll = setting('db')->get_collection('users');
 	my $user_id    = $users_coll->insert($user_data);
+#die Dumper $user_id;
 
 	setting('email')->send_validation_code(
 		email => $user_data->{emails}[0],
