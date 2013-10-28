@@ -7,7 +7,7 @@ use MooX::Types::MooseLike::Base qw(Enum);
 has user => (is => 'ro', required => 1); #, isa => 'MongoDB::OID'); # MongoID
 has ts   => (is => 'ro', default => sub { time });
 has what => (is => 'ro', required => 1,
-	isa => Enum['registered', 'delete', 'enabled', 'disabled']);
+	isa => Enum['register', 'delete', 'enabled', 'disabled']);
 has subject => (is => 'ro', required => 1);
 
 sub save {

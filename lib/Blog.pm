@@ -87,7 +87,6 @@ get '/setup' => sub {
 };
 
 post '/setup' => sub {
-	my $user_data = _check_new_user();
 
 	my $sites_coll = setting('db')->get_collection('sites');
 	die 'Already has a site' if _site_exists();
@@ -100,10 +99,19 @@ post '/setup' => sub {
 	# TODO without the quotes we get  huge and unusable stack trace
 	#die "$site_id";
 
-	$user_data->{admin} = 1;
 	my $users_coll = setting('db')->get_collection('users');
-#	$users_coll->
+	$users_coll->ensure_index({ username => 1 }, {
+		unique => boolean::true,
+	});
+
+	my $user_data = _check_new_user();
+	$user_data->{admin} = 1;
 	my $user_id    = $users_coll->insert($user_data);
+
+	my $pages_coll = setting('db')->get_collection('pages');
+	$pages_coll->ensure_index({ basename => 1 }, {
+		unique => boolean::true,
+	});
 
 	template 'message', { welcome => 1, show_sidebar => 1 };
 	#redirect '/';
@@ -113,6 +121,7 @@ post '/register' => sub {
 	my $user_data = _check_new_user();
 
 	my $users_coll = setting('db')->get_collection('users');
+	my $user_id;
 	my $user_id    = $users_coll->insert($user_data);
 	Blog::Audit->save(
 		user => $user_id,
