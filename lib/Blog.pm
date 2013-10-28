@@ -3,6 +3,7 @@ use 5.010;
 use Dancer2;
 
 use Data::Dumper qw(Dumper);
+use DateTime ();
 use Digest::SHA qw(sha1_base64);
 use Email::Valid ();
 
@@ -114,10 +115,10 @@ post '/setup' => sub {
 	$user_data->{admin} = 1;
 	my $user_id    = $users_coll->insert($user_data);
 
-	my $pages_coll = setting('db')->get_collection('pages');
-	$pages_coll->ensure_index({ basename => 1 }, {
-		unique => boolean::true,
-	});
+	#my $pages_coll = setting('db')->get_collection('pages');
+	#$pages_coll->ensure_index({ basename => 1 }, {
+	#	unique => boolean::true,
+	#});
 
 	template 'message', { welcome => 1, show_sidebar => 1 };
 	#redirect '/';
@@ -131,12 +132,11 @@ post '/register' => sub {
 	if ($u) {
 		die "Username already taken";
 	}
-	my $u = $users_coll->find_one({ 'emails.email' => $user_data->{emails}[0]{email} });
-	if ($u) {
+	my $u2 = $users_coll->find_one({ 'emails.email' => $user_data->{emails}[0]{email} });
+	if ($u2) {
 		die "Email already used";
 	}
 
-	my $user_id;
 	my $user_id    = $users_coll->insert($user_data);
 	Blog::Audit->save(
 		user => $user_id,
@@ -238,7 +238,7 @@ post '/u/create-post' => sub {
 	my $pages_coll = setting('db')->get_collection('pages');
 
 	my %data;
-	# TODO: updated_timestamp
+	$data{updated_timestamp} = DateTime->now;
 	my $page_id = params->{id};
 	my $user_id = session('user_id');
 	if ($page_id) {
@@ -259,11 +259,21 @@ post '/u/create-post' => sub {
 	}
 
 	# TODO: add published_timestamp
-	# TODO: add created_timestamp
 
 	# New post
+	my $users_coll = setting('db')->get_collection('users');
+	my $user = $users_coll->find_one({ _id => $user_id });
+	die 'Could not find user' if not $user;
+	# TODO, check if the user has the right to create a page?
 	$data{author_id} = $user_id;
+	$data{created_timestamp} = DateTime->now;
 
+	# blogs.perl.org style:
+	$data{permalink} = sprintf '/users/%s/%s/%s/%s.html',
+		$user->{username},
+    	$data{created_timestamp}->year,
+    	$data{created_timestamp}->month,
+		$data{basename};
 	$page_id = $pages_coll->insert( \%data );
 	return 1;	
 };

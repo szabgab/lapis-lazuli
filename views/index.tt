@@ -7,8 +7,9 @@ No posts yet
     <div class="abstract">
       <% p.abstract %>
     </div>
-    <a href=""><% p.number_of_comments %> comments</a> 
-    <a href=""><% IF p.body %>Continue reading<% ELSE %>Permalink<% END %></a>
+    <a href="<% p.permalink %>#comments"><% p.number_of_comments %> comments</a> 
+    <a href="<% p.permalink %>"><% IF p.body %>Continue reading<% ELSE %>Permalink<% END %></a>
+
   </div>
 
 <% END %>
