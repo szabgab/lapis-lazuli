@@ -8,6 +8,7 @@ use Email::Valid ();
 
 use Blog::Email;
 use Blog::DB;
+use Blog::Audit;
 
 our $VERSION = '0.1';
 
@@ -113,6 +114,11 @@ post '/register' => sub {
 
 	my $users_coll = setting('db')->get_collection('users');
 	my $user_id    = $users_coll->insert($user_data);
+	Blog::Audit->save(
+		user => $user_id,
+		what => 'register',
+		subject => '',
+	);
 #die Dumper $user_id;
 
 	setting('email')->send_validation_code(
@@ -286,6 +292,13 @@ get '/users/:username/:page' => sub {
 };
 
 
+get '/a/audit' => sub {
+	my $audit_coll = setting('db')->get_collection('audit');
+	my $all_entries = $audit_coll->find();
+
+	template 'list_audit', {audit => [ $all_entries->all ] };
+};
+
 get '/a/list-users' => sub {
 	my $users_coll = setting('db')->get_collection('users');
 	my $all_users = $users_coll->find();
@@ -312,6 +325,13 @@ get '/a/delete-user' => sub {
 	my $users_coll = setting('db')->get_collection('users');
 	my $user  = $users_coll->find_one({ _id => MongoDB::OID->new(value => $user_id) });
 	my $ret = $users_coll->remove({ _id => MongoDB::OID->new(value => $user_id) });
+
+	Blog::Audit->save(
+		user => $user_id,
+		what => 'delete',
+		subject => "User $user->{username} deleted",
+	);
+
 	#die Dumper $ret;
 	#die "Could not find user" if not $user;
 	#die Dumper $user;

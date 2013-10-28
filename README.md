@@ -12,18 +12,9 @@ TODO
 - allow the user to change display name and password
   and to have several e-mail addresses on file, with one of them being the 
   primary address.
-  (the list of e-mail addresses might need to be an array of hashes
 - When deleting a user ask for confirmation
   and remove all the posts and comments the user made.
 - Allow disabling users (by administrators)
-- Add an audit trail with events:
-    {
-      user => id,
-      what => 'registered' / deleted / enabled / disabled / etc
-      the subject => user_id | post_id | etc..
-      ts => time,
-    }
-
 - make sure the display names are unique as well (we probably don't want to let the readers be confused)
 
 

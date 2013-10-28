@@ -1,0 +1,18 @@
+<h2>Audit</h2>
+
+<table>
+<tr>
+  <th>Who</th>
+  <th>When</th>
+  <th>What</th>
+  <th>Subject</th>
+</tr>
+<% FOR a IN audit %>
+<tr>
+  <td><% a.user %></td>
+  <td><% a.ts %></td>
+  <td><% a.what %></td>
+  <td><% a.subject %></td>
+</tr>
+<% END %>
+</table>
