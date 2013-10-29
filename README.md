@@ -6,9 +6,6 @@ http://en.wikipedia.org/wiki/Lapis_lazuli
 TODO
 =====
 
-- make sure an e-mail address can only belong to one user
-- make sure the username is unique
-
 - allow the user to change display name and password
   and to have several e-mail addresses on file, with one of them being the 
   primary address.
@@ -18,58 +15,16 @@ TODO
 - make sure the display names are unique as well (we probably don't want to let the readers be confused)
 
 
-
-
-
-
-Specification
-=============
-
-
-Registration:
-   Username: *
-   Display Name:*
-   Email Address: *
-   Initial Password: *
-   Password Confirm: *
-   Website URL:
-
-   CAPTCHA
-   About: (text box)
-
-=> Show page a "Profile Created" and send e-mail with confirmation link
-   Including as parameters: the URL of the blog a blog_id=1, user_id=2407, token=long random string
-
-  Clicking ont the confirmation link I get to the "Sign in" page
-  tha also says "Thanks for the confirmation. Please sign in"
-
-
-Sign in:
-  Username:
-  Password:
-  Rememeber me? (checkbox)
- "Sign In" button
-
-  Link to "Sign Up"
   Link to "Forgot your Password?
 
 
- Or Sign in using:
+Allow login with some other services:
    Open ID (which is going away)
    Live Journal
    WordPress.com
    Google
+   ???
 
-Edit Profile:
-  Username cannot be changed
-  Display Name:
-  Email address:
-  Website
-  New Password:
-  Confirm Password:
-  Userpic (Browse to upload)
-  About (text box)
-  Save (button)
 
 
 Create Entry:

@@ -318,7 +318,13 @@ post '/u/edit-profile' => sub {
 	$users_coll->update({ _id => MongoDB::OID->new(value => "$user_id") },
 		{ '$set' => \%data },
 	);
-	template 'message', { profile_updated => 1 };
+
+	my $user  = $users_coll->find_one({ _id => MongoDB::OID->new(value => "$user_id") });
+	$user->{id} = "$user->{_id}";
+	template 'message', {
+		profile_updated => 1,
+		the_user => $user,
+	};
 };
 
 get '/users/:username/:page' => sub {
@@ -452,3 +458,91 @@ sub logged_in {
 }
 
 true;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Blog - just a blog
+
+=head1 INSTALLATION
+
+It requires MongoDB to be installed.
+On Ubuntu that means mongodb and mongodb-dev packages.
+
+Install cpan minus:
+
+   $ curl -L http://cpanmin.us | perl - App::cpanminus
+
+Then install the Blog:
+
+    $ cpanm Blog
+
+=head1 SETUP
+
+Once the application is installed the database needs
+to be configured:
+
+TBD
+
+=head1 DESCRIPTION
+
+=head2 Registration
+
+Required fields:
+
+   Username: *
+   Email Address: *
+   Initial Password: *
+   Password Confirm: *
+
+   CAPTCHA
+
+Once the registration is submitted we
+show a page called "Profile Created"
+and send e-mail with confirmation link.
+The link contains the user_id and a  token
+which is a long random string.
+
+Clicking ont the confirmation link the 
+user gets to a page saying
+"Thanks for validating the e-mail address.
+Please log in"
+
+=head2 Log in
+
+  Username:
+  Password:
+  "Log In" button
+
+Do we need a Rememeber me checkbox?
+
+=head2 User Profile
+
+Additional information the user can provide
+in their profile:
+
+   Display Name:
+   About: (text box)
+   Website URL:
+
+=head2 Edit Profile
+
+  Username cannot be changed ????
+  Display Name:
+  Email address:
+  Website
+  New Password:
+  Confirm Password:
+  Userpic (Browse to upload)
+  About (text box)
+  Save (button)
+
+  An e-mail address can only belong to one user
+  The username is unique
+
+
+=cut
+
