@@ -208,6 +208,14 @@ get '/logout' => sub {
 };
 
 
+get '/tag/:tag' => sub {
+	my $tag = params->{tag};
+	my $pages_coll = setting('db')->get_collection('pages');
+	my $pages = $pages_coll->find({ tags => $tag });
+	template 'index', {pages => [map {$_->{id} = $_->{_id}; $_ } $pages->all]};
+};
+
+
 get '/u/create-post' => sub {
 	my $id = params->{id};
 	if ($id) {
@@ -499,6 +507,10 @@ Required fields:
    Password Confirm: *
 
    CAPTCHA
+
+Try to fetch a Gravatar based on the
+e-mail address and save it as the default
+user picture.
 
 Once the registration is submitted we
 show a page called "Profile Created"

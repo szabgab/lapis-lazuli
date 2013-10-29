@@ -4,5 +4,11 @@
 
 <% page.body %>
 
-<% page.tags %>
+<div id="tags">
+<ul>
+<% FOR t IN page.tags %>
+  <li><a href="/tag/<% t %>"><% t %></a></li>
+<% END %>
+</ul>
+</div>
 
