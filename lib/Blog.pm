@@ -207,6 +207,7 @@ get '/logout' => sub {
 	redirect '/';
 };
 
+
 get '/u/create-post' => sub {
 	my $id = params->{id};
 	if ($id) {
@@ -333,6 +334,17 @@ get '/users/:username/:page' => sub {
 		return template 'profile', { the_user => $user };
 	}
 	die 'Not implemented';
+};
+
+get qr{^/users/.*} => sub {
+	my $path = request->path;
+	my $pages_coll = setting('db')->get_collection('pages');
+	my $page = $pages_coll->find_one( { permalink => $path } );
+	pass if not $page;	
+
+	template 'page', {
+		page => $page,
+	}
 };
 
 
