@@ -3,17 +3,23 @@
 <tr>
    <th>Title</th>
    <th>Status</th>
-   <th>Author</th>
+   <% IF admin_list %>
+     <th>Author</th>
+   <% END %>
    <th>Created</th>
    <th>Action</th>
+   <th>Show</th>
 </tr>
 <% FOR p IN pages %>
   <tr>
     <td><% p.title %></td>
     <td><% p.status %></td>
-    <td><% p.author_id %></td>
-    <td><% p.create_timestamp %></td>
+    <% IF admin_list %>
+      <td><% p.author_id %></td>
+    <% END %>
+    <td><% p.created_timestamp %></td>
     <td><a href="/u/create-post?id=<% p.id %>">edit</a></td>
+    <td><a href="<% p.permalink %>">show</a></td>
   </tr>
 <% END %>
 </table>

@@ -285,6 +285,16 @@ get '/u/list-posts' => sub {
 	template 'list_pages', {pages => [map {$_->{id} = $_->{_id}; $_ } $all_pages->all]};
 };
 
+get '/a/list-posts' => sub {
+	my $pages_coll = setting('db')->get_collection('pages');
+	my $all_pages = $pages_coll->find( );
+
+	template 'list_pages', {
+		pages => [map {$_->{id} = $_->{_id}; $_ } $all_pages->all],
+		admin_list => 1};
+};
+
+
 get '/u/edit-profile' => sub {
 	my $user_id = session('user_id');
 	my $users_coll = setting('db')->get_collection('users');

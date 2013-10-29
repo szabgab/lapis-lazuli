@@ -42,6 +42,7 @@
             <ul class="links admin">
               <li>Administrator tools</li>
               <li><a href="/a/list-users">List Users</a></li>
+              <li><a href="/a/list-posts">List Posts</a></li>
               <li><a href="/a/audit">Audit trail</a></li>
             </ul>
           <% END %>
