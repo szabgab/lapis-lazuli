@@ -16,11 +16,6 @@ END {
 use Blog;
 use Dancer2::Test apps => ['Blog'];
 
-ok 1;
-#route_exists [GET => '/'], 'a route handler is defined for /';
-#
-
-# This depends on the status of the MongoDB, it sould be set for the test
 subtest 'root' => sub {
 	plan tests => 2;
 	my $response = dancer_response GET => '/';
@@ -32,5 +27,21 @@ subtest '/setup' => sub {
 	plan tests => 1;
 	my $response = dancer_response GET => '/setup';
 	like $response->content, qr/Welcome to the installation tool/;
-}
+};
+
+subtest '/setup' => sub {
+	plan tests => 1;
+	my $response = dancer_response POST => '/setup', {
+		params => {
+			site_title       => "Test",
+			username         => 'test_admin',
+			email_address    => 'szabgab@cpan.org',
+			initial_password => 'admin_pw',
+			password_confirm => 'admin_pw',
+		},
+	};
+	#diag explain $response;
+	like $response->content, qr/Congratulations. You've finished setting up the web site./;
+};
+
 
