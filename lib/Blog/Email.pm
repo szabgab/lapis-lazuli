@@ -47,6 +47,7 @@ END_MSG
 		body => $body,
 	);
  
+	return if $ENV{TEST_HOST};
 	sendmail($email);
 }
 
@@ -72,8 +73,8 @@ END_MSG
 		body => $body,
 	);
  
+	return if $ENV{TEST_HOST};
 	sendmail($email);
-
 }
 
 

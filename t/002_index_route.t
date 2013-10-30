@@ -1,4 +1,4 @@
-use Test::More tests => 8;
+use Test::More tests => 9;
 use strict;
 use warnings;
 
@@ -133,6 +133,46 @@ subtest '/register' => sub {
 		#diag $response->content;
 		like $response->content, qr/Thank you for registering./;
 	}
+};
+
+my $title = "What is Lorem Ipsum?";
+my $text = <<"END_TEXT";
+Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum
+END_TEXT
+# Source: http://www.lipsum.com/
+
+subtest '/u/create-post' => sub {
+	plan tests => 3;
+
+	# login
+	my $r1 = dancer_response GET => '/login';
+	like $r1->content, qr{<input type="submit" value="Log in" />};
+	my $r2 = dancer_response POST => '/login', {
+		params => {
+			username => $users[0]{username},
+			password => $users[0]{initial_password},
+		},
+	};
+	like $r2->content, qr{Thanks $users[0]{username} for logging in};
+	#diag explain $r2->{headers};
+	#diag explain $r2->{headers}{'set-cookie'};
+
+	#my ($cookie) = $r2->{headers}{'set-cookie'} =~ /(dancer.session=[^;]+);/;
+	my ($cookie) =  $r2->header('set-cookie') =~ /(dancer.session=[^;]+);/;
+	diag $cookie;
+	my ($id) = (split /=/, $cookie)[1];
+	diag $id;
+	ok -e "sessions/$id.yml";
+	# make sure we have the cookie
+	my $r3 = dancer_response GET => '/', {
+		headers => [
+			#[ 'Cookie' => $r2->{headers}{'set-cookie'} ],
+			[ 'Cookie' => $cookie ],
+		],
+	};
+	#diag explain $r3->content;
+
+	# post article
 };
 
 
