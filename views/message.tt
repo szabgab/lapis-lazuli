@@ -41,3 +41,7 @@ Email verified. Thank you!
 Could not verify the e-mail address.
 <% END %>
 
+<% IF logged_in %>
+Thanks <% user.display_name %> for logging in.
+<% END %>
+

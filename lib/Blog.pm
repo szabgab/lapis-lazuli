@@ -176,7 +176,7 @@ post '/login' => sub {
 
 	#forward '/'; # cannot forward, probably because this is a POST and / is only defined for GET
 	#redirect '/', 303; # the cookie is not set!
-	template 'index'; # not nice, but it works for now
+	template 'message', {logged_in => 1} ;
 };
 
 get '/validate-email/:id/:code' => sub {
