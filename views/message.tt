@@ -90,5 +90,38 @@ Need either username or email address.
 <% END %>
 
 
+<% IF user_does_not_have_email %>
+This user does not have an e-mail.
+<% END %>
+
+<% IF site_exists %>
+Already has a site.
+<% END %>
+
+<% IF missing_site_title %>
+Missing site_title.
+<% END %>
+
+<% IF invalid_site_title %>
+Invalid site title.
+<% END %>
+
+<% IF missing_username %>
+Missing username
+<% END %>
+
+<% IF missing_password %>
+Missing password
+<% END %>
+
+<% IF could_not_authenticate %>
+Could not authenticate
+<% END %>
+
+<% IF could_not_find_page_for_id %>
+Could not find page for id '<% id %>'
+<% END %>
+
+
 
 

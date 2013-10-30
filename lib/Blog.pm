@@ -130,7 +130,7 @@ post '/reset-password' => sub {
 	} else {
 		return _error('need_username_or_email');
 	}
-	die "This user does not have an e-mail"
+	return _error('user_does_not_have_email')
 		if not $user->{emails}[0]{email};
 	# TODO shall we check if the e-mail is verified?
 
@@ -144,8 +144,6 @@ post '/reset-password' => sub {
 			password_reset_ts   => DateTime->now,
 		},
 	});
-
-#die Dumper $user;
 
 	setting('email')->send_password_set_code(
 		code  => $reset_code,
@@ -190,12 +188,12 @@ get '/setup' => sub {
 post '/setup' => sub {
 
 	my $sites_coll = setting('db')->get_collection('sites');
-	die 'Already has a site' if _site_exists();
+	return _error('site_exists') if _site_exists();
 
 	my $site_title = params->{site_title};
-	die 'Missing site_title' if not $site_title;
+	return _error('missing_site_title') if not $site_title;
 	$site_title =~ s/^\s+|\s+$//g;
-	die 'Invalid site title' if not $site_title;
+	return _error('invalid_site_title') if not $site_title;
 	my $site_id = $sites_coll->insert({ site_title => $site_title });
 	# TODO without the quotes we get  huge and unusable stack trace
 	#die "$site_id";
@@ -237,7 +235,6 @@ post '/register' => sub {
 		what => 'register',
 		subject => '',
 	);
-#die Dumper $user_id;
 
 	setting('email')->send_validation_code(
 		email => $user_data->{emails}[0],
@@ -254,8 +251,8 @@ get '/login' => sub {
 };
 
 post '/login' => sub {
-	die 'Missing username' if not params->{username};
-	die 'Missing password' if not params->{password};
+	_error('missing_username') if not params->{username};
+	_error('missing_password') if not params->{password};
 	my %user = (
 		username => params->{username},
 		password => sha1_base64(params->{password}),
@@ -263,7 +260,7 @@ post '/login' => sub {
 
 	my $users_coll = setting('db')->get_collection('users');
 	my $user_id    = $users_coll->find_one(\%user);
-	die "Could not authenticate" if not $user_id;
+	return _error('could_not_authenticate') if not $user_id;
 
 	session last_seen => time;
 	session user_id => $user_id->{_id};
@@ -288,7 +285,6 @@ get '/validate-email/:id/:code' => sub {
 			'$set' => { 'emails.$.verified' => boolean::true }, 
 			'$unset' => { 'emails.$.verify_code' => '' },
 		});
-	#die Dumper $res;
 	if ($res->{updatedExisting}) {
 		template 'message', { email_verified => 1 };
 	} else {
@@ -315,7 +311,7 @@ get '/u/create-post' => sub {
 	if ($id) {
 		my $pages_coll = setting('db')->get_collection('pages');
 		my $page  = $pages_coll->find_one({ _id => MongoDB::OID->new(value => $id) });
-		die "Could not find page for id '$id'" if not $page;
+		_error('could_not_find_page_for_id', id => $id) if not $page;
 		if ($page->{author_id} ne session('user_id')) {
 			die "You cannot edit someone elses page!";
 		}
@@ -517,8 +513,8 @@ get '/a/delete-user' => sub {
 };
 
 sub _error {
-	my ($code) = @_;
-	template 'message', { $code => 1 };
+	my ($code, %args) = @_;
+	template 'message', { $code => 1, %args };
 }
 
 sub _check_new_user {
