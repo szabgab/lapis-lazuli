@@ -1,4 +1,4 @@
-use Test::More tests => 7;
+use Test::More tests => 8;
 use strict;
 use warnings;
 
@@ -98,6 +98,42 @@ subtest '/register' => sub {
 	like $response->content, qr/Email already used/;
 };
 
+# register 3 users
+# post 2 articles each with long text
+# check if they show up correctly, check paging (set the page size to 4)
+
+my @users = (
+	{
+		username => 'bar',
+		email_address => 'bar@examples.com',
+		initial_password => 'bar_pw',
+		password_confirm => 'bar_pw',
+	},
+	{
+		username => 'zorg',
+		email_address => 'zorg@examples.com',
+		initial_password => 'zorg_pw',
+		password_confirm => 'zorg_pw',
+	},
+	{
+		username => 'foo',
+		email_address => 'foo@examples.com',
+		initial_password => 'foo_pw',
+		password_confirm => 'foo_pw',
+	},
+);
+
+subtest '/register' => sub {
+	plan tests => 2*@users;
+	foreach my $u (@users) {
+		my $response = dancer_response POST => '/register', {
+			params => $u,
+		};
+		is $response->status, 200;
+		#diag $response->content;
+		like $response->content, qr/Thank you for registering./;
+	}
+};
 
 
 
