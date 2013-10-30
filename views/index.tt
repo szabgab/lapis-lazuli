@@ -4,6 +4,9 @@ No posts yet
 <% FOR p in pages %>
   <div class="main_post">
     <h2><a href="<% p.permalink %>"><% p.title %></a></h2>
+    <div class="by_line">
+    By <b><a href="/users/<% p.username %>/profile"><% p.display_name %></a></b> on <% p.published_timestamp %>
+    </div>
     <div class="abstract">
       <% p.abstract %>
     </div>

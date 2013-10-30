@@ -162,8 +162,17 @@ get '/message/:code' => sub {
 
 any ['get', 'post'] => '/' => sub {
 	my $pages_coll = setting('db')->get_collection('pages');
+	my $users_coll = setting('db')->get_collection('users');
 	my $all_pages = $pages_coll->find( { status => 'published' } );
-	template 'index', {pages => [map {$_->{id} = $_->{_id}; $_ } $all_pages->all]};
+	my @pages;
+	while (my $p = $all_pages->next) {
+		$p->{id} = $p->{_id};
+		my $user = $users_coll->find_one({ _id => $p->{author_id} });
+		$p->{username}     = $user->{username};
+		$p->{display_name} = $user->{display_name} || $user->{username};
+		push @pages, $p;
+	 };
+	template 'index', {pages => \@pages};
 };
 
 get '/register' => sub {
