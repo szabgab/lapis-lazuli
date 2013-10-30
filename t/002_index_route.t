@@ -142,7 +142,9 @@ END_TEXT
 # Source: http://www.lipsum.com/
 
 subtest '/u/create-post' => sub {
-	plan tests => 3;
+	plan tests => 4;
+	my $cnt = 0;
+
 
 	# login
 	my $r1 = dancer_response GET => '/login';
@@ -154,10 +156,7 @@ subtest '/u/create-post' => sub {
 		},
 	};
 	like $r2->content, qr{Thanks $users[0]{username} for logging in};
-	#diag explain $r2->{headers};
-	#diag explain $r2->{headers}{'set-cookie'};
 
-	#my ($cookie) = $r2->{headers}{'set-cookie'} =~ /(dancer.session=[^;]+);/;
 	my ($cookie) =  $r2->header('set-cookie') =~ /(dancer.session=[^;]+);/;
 	#diag $cookie;
 	#my ($id) = (split /=/, $cookie)[1];
@@ -175,7 +174,21 @@ subtest '/u/create-post' => sub {
 	like $r3->content, qr{<li><a href="/u/create-post">Create Post</a></li>};
 	#diag explain $r3->content;
 
-	# post article
+	# post an article  article
+	$cnt++;
+	# just andomly splt up the text to abstract and body
+	my $split = int rand length $text;
+	my $r4 = dancer_response POST => '/u/create-post', {
+		params => {
+			title => "$title ($users[0]{username})",
+			basename => "post-$cnt",
+			abstract => substr($text, 0, $split),
+			body     => substr($text, $split),
+			status   => 'published',
+		},
+	};
+	is $r4->content, 1;
+
 };
 
 
