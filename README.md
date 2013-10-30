@@ -9,10 +9,11 @@ TODO
 - When deleting a user ask for confirmation
   and remove all the posts and comments the user made.
 - Allow disabling users (by administrators)
-- make sure the display names are unique as well (we probably don't want to let the readers be confused)
+- ?? make sure the display names are unique as well (we probably don't want to let the readers be confused)
 
 
-  Link to "Forgot your Password?
+Show the personal picture of each user next to their post and next to their
+comment (probably a smaller picture).
 
 
 Allow login with some other services:

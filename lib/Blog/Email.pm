@@ -50,6 +50,32 @@ END_MSG
 	sendmail($email);
 }
 
+sub send_password_set_code {
+	my ($self, %data) = @_;
+
+	my $url = $self->url;
+
+	my $body = <<"END_MSG";
+Hi,
+
+In order reset your password, please click on the following link:
+$url/reset-password/$data{id}/$data{code}
+
+END_MSG
+
+	my $email = Email::Simple->create(
+		header => [
+			To    => qq{"$data{name}" <$data{email}{email}>}, 
+			From  => '<gabor@perlmaven.com>',
+			Subject => "To set your new password",
+		],
+		body => $body,
+	);
+ 
+	sendmail($email);
+
+}
+
 
 1;
 

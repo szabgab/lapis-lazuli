@@ -73,6 +73,89 @@ hook before_template => sub {
 	return;
 };
 
+get '/reset-password' => sub {
+	template 'reset_password';
+};
+
+get '/reset-password/:id/:code' => sub {
+	template 'set_password';
+};
+
+post '/reset-password/:id/:code' => sub {
+	my $id = params->{id};
+	my $code= params->{code};
+
+	my $users_coll = setting('db')->get_collection('users');
+	my $user = $users_coll->find_one({
+			_id => MongoDB::OID->new(value => $id),
+			password_reset_code => $code,
+	});
+	die "Could not find user"
+		if not $user;
+
+	die "No password provided" if not params->{new_password};
+	my $password = params->{new_password};
+	die "Password need to be confirmed" if not params->{password_confirm};
+	die "Not the same passwords" if $password ne params->{password_confirm};
+	$password = sha1_base64($password);
+
+	$users_coll->update({
+			_id => MongoDB::OID->new(value => $id),
+			password_reset_code => $code,
+	},{
+		'$set' => { password => $password },
+		'$unset' => {
+			password_reset_code => '',
+			password_reset_ts => '',
+		},
+	});
+
+	template 'message', { new_password_set => 1 };
+};
+
+post '/reset-password' => sub {
+	my $users_coll = setting('db')->get_collection('users');
+	my $username = params->{username};
+	my $email    = params->{email};
+	my $user;
+	if ($username) {
+		$user = $users_coll->find_one({ username => $username });
+		die "Could not find the user based on the username"
+			if not $user;
+	} elsif ($email) {
+		$user = $users_coll->find_one({ 'emails.email'  => $email });
+		die "Could not find the user based on the email address."
+			if not $user;
+	} else {
+		die "Need either username or email address";
+	}
+	die "This user does not have an e-mail"
+		if not $user->{emails}[0]{email};
+	# TODO shall we check if the e-mail is verified?
+
+	# TODO shall we set it verified if the user has reset the password using
+	# this e-mail address?
+
+	my $reset_code = _generate_code();
+	$users_coll->update({ _id => $user->{_id} }, {
+		'$set' => {
+			password_reset_code => $reset_code,
+			password_reset_ts   => DateTime->now,
+		},
+	});
+
+#die Dumper $user;
+
+	setting('email')->send_password_set_code(
+		code  => $reset_code,
+		email => $user->{emails}[0],
+		id    => "$user->{_id}",
+		name  => ($user->{display_name} || $user->{username}),
+	);
+
+	template 'message', { reset_pw_sent => 1 };
+};
+
 get '/message/:code' => sub {
 	template 'message', { params->{code} => 1 };
 };
@@ -427,7 +510,7 @@ sub _check_new_user {
 	die 'Missing password' if not params->{initial_password} or not params->{password_confirm};
 	die 'Passwords differ' if params->{initial_password} ne params->{password_confirm};
 
-	my $now = time;
+	my $now = DateTime->now;
 
 	my %user = (
 		username     => params->{username},
@@ -563,6 +646,10 @@ in their profile:
 
   TODO: Allow the user to have several e-mail addresses on file,
         with one of them being the primary address.
+
+
+  Allow the user to "Reset Password" by typing in either the username or the e-mail address
+  and getting an e-mail with a code including a link to a password reset page. 
 
 =cut
 

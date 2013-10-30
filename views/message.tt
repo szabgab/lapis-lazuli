@@ -45,3 +45,12 @@ Could not verify the e-mail address.
 Thanks <% user.display_name %> for logging in.
 <% END %>
 
+<% IF reset_pw_sent %>
+Email to set new passwrod was sent to you. Please check your e-mail account. 
+<% END %>
+
+<% IF new_password_set %>
+Your new password was set. Please try to <a href="/login">log in</a>.
+<% END %>
+
+
