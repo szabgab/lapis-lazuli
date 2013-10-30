@@ -313,11 +313,18 @@ get '/u/edit-profile' => sub {
 };
 post '/u/edit-profile' => sub {
 	my %data = (
-		username     => params->{username},
+		#username     => params->{username},
 		display_name => params->{display_name},
 		website      => params->{website},
 		about        => params->{about},
 	);
+
+	if (params->{new_password}) {
+		my $password = params->{new_password};
+		die "Password need to be confirmed" if not params->{password_confirm};
+		die "Not the same passwords" if $password ne params->{password_confirm};
+		$data{password} = sha1_base64($password);
+	}
 
 	#die if not $display_name or $display_name !~ /\S/;
 
@@ -542,7 +549,7 @@ in their profile:
 
 =head2 Edit Profile
 
-  Username cannot be changed ????
+  Username is unique and it cannot be changed.
   Display Name:
   Email address:
   Website
@@ -553,8 +560,9 @@ in their profile:
   Save (button)
 
   An e-mail address can only belong to one user
-  The username is unique
 
+  TODO: Allow the user to have several e-mail addresses on file,
+        with one of them being the primary address.
 
 =cut
 

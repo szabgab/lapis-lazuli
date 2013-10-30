@@ -6,9 +6,6 @@ http://en.wikipedia.org/wiki/Lapis_lazuli
 TODO
 =====
 
-- allow the user to change display name and password
-  and to have several e-mail addresses on file, with one of them being the 
-  primary address.
 - When deleting a user ask for confirmation
   and remove all the posts and comments the user made.
 - Allow disabling users (by administrators)
