@@ -159,17 +159,20 @@ subtest '/u/create-post' => sub {
 
 	#my ($cookie) = $r2->{headers}{'set-cookie'} =~ /(dancer.session=[^;]+);/;
 	my ($cookie) =  $r2->header('set-cookie') =~ /(dancer.session=[^;]+);/;
-	diag $cookie;
-	my ($id) = (split /=/, $cookie)[1];
-	diag $id;
-	ok -e "sessions/$id.yml";
+	#diag $cookie;
+	#my ($id) = (split /=/, $cookie)[1];
+	#diag $id;
+	#ok -e "sessions/$id.yml";
 	# make sure we have the cookie
-	my $r3 = dancer_response GET => '/', {
-		headers => [
+	$ENV{HTTP_COOKIE} = $cookie;
+	my $r3 = dancer_response GET => '/';
+	#, {
+	#	headers => [
 			#[ 'Cookie' => $r2->{headers}{'set-cookie'} ],
-			[ 'Cookie' => $cookie ],
-		],
-	};
+	#		[ 'Cookie' => $cookie ],
+	#	],
+	#};
+	like $r3->content, qr{<li><a href="/u/create-post">Create Post</a></li>};
 	#diag explain $r3->content;
 
 	# post article
