@@ -21,7 +21,9 @@ our $VERSION = '0.1';
 
 hook before => sub {
 	# TODO get this from the configuration file
-	set db => Blog::DB->instance(host => 'localhost:27017', database => 'ourblog')->db;
+	my $database = $ENV{TEST_DB}   || config->{blog}{database_name};
+	my $host     = $ENV{TEST_HOST} || config->{blog}{database_host};
+	set db => Blog::DB->instance(host => $host, database => $database)->db;
 
 	set email => Blog::Email->new(url => request->uri_base);
 

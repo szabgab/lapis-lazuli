@@ -29,3 +29,9 @@ engines:
 
 session: YAML
 
+blog:
+  database_name: "ourblog"
+  database_host: "localhost:27017"
+
+
+
