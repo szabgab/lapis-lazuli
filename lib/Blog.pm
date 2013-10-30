@@ -313,7 +313,7 @@ get '/u/create-post' => sub {
 		my $page  = $pages_coll->find_one({ _id => MongoDB::OID->new(value => $id) });
 		_error('could_not_find_page_for_id', id => $id) if not $page;
 		if ($page->{author_id} ne session('user_id')) {
-			die "You cannot edit someone elses page!";
+			return _error('not_your_article');
 		}
 		$page->{id} = $page->{_id};
 		if ($page->{tags}) {
@@ -342,7 +342,7 @@ post '/u/create-post' => sub {
 	my $user_id = session('user_id');
 	if ($page_id) {
 		my $page  = $pages_coll->find_one({ _id => MongoDB::OID->new(value => $page_id) });
-		die "This is someone elses post!" if $page->{author_id} ne $user_id;
+		return _error('not_your_article') if $page->{author_id} ne $user_id;
 		%data = %$page;
 	}
 
@@ -362,7 +362,7 @@ post '/u/create-post' => sub {
 	# New post
 	my $users_coll = setting('db')->get_collection('users');
 	my $user = $users_coll->find_one({ _id => $user_id });
-	die 'Could not find user' if not $user;
+	return _error('could_not_find_user') if not $user;
 	# TODO, check if the user has the right to create a page?
 	$data{author_id} = $user_id;
 	$data{created_timestamp} = DateTime->now;
@@ -411,8 +411,8 @@ post '/u/edit-profile' => sub {
 
 	if (params->{new_password}) {
 		my $password = params->{new_password};
-		die "Password need to be confirmed" if not params->{password_confirm};
-		die "Not the same passwords" if $password ne params->{password_confirm};
+		return _error('no_password_confirm') if not params->{password_confirm};
+		return _error('password_missmatch') if $password ne params->{password_confirm};
 		$data{password} = sha1_base64($password);
 	}
 
@@ -444,7 +444,7 @@ get '/users/:username/:page' => sub {
 
 		return template 'profile', { the_user => $user };
 	}
-	die 'Not implemented';
+	return _error('not_implemented');
 };
 
 get qr{^/users/.*} => sub {
@@ -518,14 +518,17 @@ sub _error {
 }
 
 sub _check_new_user {
-	die 'Missing username' if not params->{username} or params->{username} !~ /^\w+$/;
-	die 'Missing email' if not params->{email_address};
+	return _error('missing_username') if not params->{username};
+	return _error('invalid_username') if params->{username} !~ /^\w+$/;
+	return _error('missing_email') if not params->{email_address};
 	my $supplied_email = lc params->{email_address};
 	$supplied_email =~ s/^\s+|\s+$//g;
 	my $email = Email::Valid->address($supplied_email);
-	die 'Invalid email' if not $email or $email ne $supplied_email;
-	die 'Missing password' if not params->{initial_password} or not params->{password_confirm};
-	die 'Passwords differ' if params->{initial_password} ne params->{password_confirm};
+	return _error('invalid_email') if not $email or $email ne $supplied_email;
+	return _error('missing_password')
+		if not params->{initial_password} or not params->{password_confirm};
+	return _error('password_missmatch')
+		if params->{initial_password} ne params->{password_confirm};
 
 	my $now = DateTime->now;
 

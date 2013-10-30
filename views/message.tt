@@ -74,7 +74,7 @@ Password need to be confirmed.
 <% END %>
 
 <% IF password_mismatch %>
-Not the same passwords
+Not the same passwords.
 <% END %>
 
 <% IF no_such_username %>
@@ -107,21 +107,46 @@ Invalid site title.
 <% END %>
 
 <% IF missing_username %>
-Missing username
+Missing username.
 <% END %>
 
 <% IF missing_password %>
-Missing password
+Missing password.
 <% END %>
 
 <% IF could_not_authenticate %>
-Could not authenticate
+Could not authenticate.
 <% END %>
 
 <% IF could_not_find_page_for_id %>
 Could not find page for id '<% id %>'
 <% END %>
 
+<% IF not_your_article %>
+You cannot edit this page. This is not your article.
+<% END %>
 
+<% IF could_not_find_user %>
+Could not find user.
+<% END %>
 
+<% IF no_password_confirm %>
+Password need to be confirmed.
+<% END %>
+
+<% IF not_implemented %>
+Strange. You reached a place in the code that has not been implemented yet.
+<% END %>
+
+<% IF invalid_username %>
+Invalid username.
+<% END %>
+
+<% IF missing_email %>
+Missing email.
+<% END %>
+
+<% IF invalid_email %>
+Invalid email.
+<% END %>
 
