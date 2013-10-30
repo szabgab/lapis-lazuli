@@ -224,11 +224,11 @@ post '/register' => sub {
 	my $users_coll = setting('db')->get_collection('users');
 	my $u = $users_coll->find_one({ username => $user_data->{username} });
 	if ($u) {
-		die "Username already taken";
+		return _error('username_taken');
 	}
 	my $u2 = $users_coll->find_one({ 'emails.email' => $user_data->{emails}[0]{email} });
 	if ($u2) {
-		die "Email already used";
+		return _error('email_used');
 	}
 
 	my $user_id    = $users_coll->insert($user_data);
@@ -510,6 +510,10 @@ get '/a/delete-user' => sub {
 	template 'message', { user_deleted => 1 };
 };
 
+sub _error {
+	my ($code) = @_;
+	template 'message', { $code => 1 };
+}
 
 sub _check_new_user {
 	die 'Missing username' if not params->{username} or params->{username} !~ /^\w+$/;

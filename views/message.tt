@@ -53,4 +53,11 @@ Email to set new passwrod was sent to you. Please check your e-mail account.
 Your new password was set. Please try to <a href="/login">log in</a>.
 <% END %>
 
+<% IF username_taken %>
+Username already taken
+<% END %>
+
+<% IF email_used %>
+Email already used
+<% END %>
 
