@@ -6,6 +6,27 @@ http://en.wikipedia.org/wiki/Lapis_lazuli
 TODO
 =====
 
+- Add published time stamp to the front page
+- Add number of comments (0)
+- In test Generate at least one post without "body"
+- Add Paging to main page
+- Limit the acceptad HTML tags and test this
+  <b>, <a href=""></a>, <ul>, <ol> <li>
+- Allow comments on the article specific page
+- Add search capability
+
+- On the page of the post add By line
+
+
+
+
+
+
+
+
+
+
+
 - When deleting a user ask for confirmation
   and remove all the posts and comments the user made.
 - Allow disabling users (by administrators)

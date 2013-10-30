@@ -1,4 +1,7 @@
 <h2><% page.title %></h2>
+<div class="by_line">
+   By <b><a href="/users/<% page.username %>/profile"><% page.display_name %></a></b> on <% page.published_timestamp %>
+</div>
 
 <% page.abstract %>
 
@@ -11,4 +14,12 @@
 <% END %>
 </ul>
 </div>
+
+<h2 id="comments">Comments</h2>
+
+<% IF number_of_comments %>
+listing ...
+<% ELSE %>
+No comments yet. Be the first to comment!
+<% END %>
 

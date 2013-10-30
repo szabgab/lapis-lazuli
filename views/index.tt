@@ -10,8 +10,12 @@ No posts yet
     <div class="abstract">
       <% p.abstract %>
     </div>
+    <div class="comments_link">
     <a href="<% p.permalink %>#comments"><% p.number_of_comments %> comments</a> 
+	</div>
+	<div class="continue_reading_link">
     <a href="<% p.permalink %>"><% IF p.body %>Continue reading<% ELSE %>Permalink<% END %></a>
+	</div>
 
   </div>
 

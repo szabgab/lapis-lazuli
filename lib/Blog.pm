@@ -171,6 +171,7 @@ any ['get', 'post'] => '/' => sub {
 		my $user = $users_coll->find_one({ _id => $p->{author_id} });
 		$p->{username}     = $user->{username};
 		$p->{display_name} = $user->{display_name} || $user->{username};
+		$p->{number_of_comments} = 0;
 		push @pages, $p;
 	 };
 	template 'index', {pages => \@pages};
@@ -455,6 +456,12 @@ get qr{^/users/.*} => sub {
 	my $pages_coll = setting('db')->get_collection('pages');
 	my $page = $pages_coll->find_one( { permalink => $path } );
 	pass if not $page;	
+
+	my $users_coll = setting('db')->get_collection('users');
+	my $user  = $users_coll->find_one({ _id => $page->{author_id} });
+	$page->{username} = $user->{username};
+	$page->{display_name} = $user->{display_name} || $user->{username};
+	$page->{number_of_comments} = 0;
 
 	template 'page', {
 		page => $page,
