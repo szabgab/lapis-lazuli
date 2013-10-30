@@ -92,13 +92,12 @@ post '/reset-password/:id/:code' => sub {
 			_id => MongoDB::OID->new(value => $id),
 			password_reset_code => $code,
 	});
-	die "Could not find user"
-		if not $user;
+	return _error('could_not_find_user') if not $user;
 
-	die "No password provided" if not params->{new_password};
+	return _error('no_password') if not params->{new_password};
 	my $password = params->{new_password};
-	die "Password need to be confirmed" if not params->{password_confirm};
-	die "Not the same passwords" if $password ne params->{password_confirm};
+	return _error('confirm_password_missing') if not params->{password_confirm};
+	return _errpr('password_mismatch') if $password ne params->{password_confirm};
 	$password = sha1_base64($password);
 
 	$users_coll->update({
@@ -122,14 +121,14 @@ post '/reset-password' => sub {
 	my $user;
 	if ($username) {
 		$user = $users_coll->find_one({ username => $username });
-		die "Could not find the user based on the username"
+		return _error('no_such_username')
 			if not $user;
 	} elsif ($email) {
 		$user = $users_coll->find_one({ 'emails.email'  => $email });
-		die "Could not find the user based on the email address."
+		return _error('no_such_email')
 			if not $user;
 	} else {
-		die "Need either username or email address";
+		return _error('need_username_or_email');
 	}
 	die "This user does not have an e-mail"
 		if not $user->{emails}[0]{email};

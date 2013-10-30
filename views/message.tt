@@ -61,3 +61,34 @@ Username already taken
 Email already used
 <% END %>
 
+<% IF could_not_find_user %>
+Could not find user
+<% END %>
+
+<% IF no_password %>
+No password provided
+<% END %>
+
+<% IF confirm_password_missing %>
+Password need to be confirmed.
+<% END %>
+
+<% IF password_mismatch %>
+Not the same passwords
+<% END %>
+
+<% IF no_such_username %>
+Could not find the user based on the username
+<% END %>
+
+<% IF no_such_email %>
+Could not find the user based on the email address.
+<% END %>
+
+<% IF need_username_or_email %>
+Need either username or email address.
+<% END %>
+
+
+
+
