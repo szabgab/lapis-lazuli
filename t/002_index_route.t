@@ -19,7 +19,9 @@ diag $ENV{TEST_DB};
 # for that case we can run the test using
 #    KEEP=1 prove -vl t/002_index_route.t 
 END {
-	unless ($ENV{KEEP}) {
+	if ($ENV{KEEP}) {
+		diag "The database calle $ENV{TEST_DB} was kept for you";
+	} else {
 		my $db = Blog::DB->instance(host => $ENV{TEST_HOST}, database => $ENV{TEST_DB})->db;
 		$db->drop;
 	}
@@ -142,53 +144,50 @@ END_TEXT
 # Source: http://www.lipsum.com/
 
 subtest '/u/create-post' => sub {
-	plan tests => 4;
+	plan tests => 6 * @users;
 	my $cnt = 0;
 
+	foreach my $i (0 .. @users-1) {
 
-	# login
-	my $r1 = dancer_response GET => '/login';
-	like $r1->content, qr{<input type="submit" value="Log in" />};
-	my $r2 = dancer_response POST => '/login', {
-		params => {
-			username => $users[0]{username},
-			password => $users[0]{initial_password},
-		},
-	};
-	like $r2->content, qr{Thanks $users[0]{username} for logging in};
+		# login
+		my $r1 = dancer_response GET => '/login';
+		like $r1->content, qr{<input type="submit" value="Log in" />};
+		my $r2 = dancer_response POST => '/login', {
+			params => {
+				username => $users[$i]{username},
+				password => $users[$i]{initial_password},
+			},
+		};
+		like $r2->content, qr{Thanks $users[$i]{username} for logging in};
 
-	my ($cookie) =  $r2->header('set-cookie') =~ /(dancer.session=[^;]+);/;
-	#diag $cookie;
-	#my ($id) = (split /=/, $cookie)[1];
-	#diag $id;
-	#ok -e "sessions/$id.yml";
-	# make sure we have the cookie
-	$ENV{HTTP_COOKIE} = $cookie;
-	my $r3 = dancer_response GET => '/';
-	#, {
-	#	headers => [
-			#[ 'Cookie' => $r2->{headers}{'set-cookie'} ],
-	#		[ 'Cookie' => $cookie ],
-	#	],
-	#};
-	like $r3->content, qr{<li><a href="/u/create-post">Create Post</a></li>};
-	#diag explain $r3->content;
+		my ($cookie) =  $r2->header('set-cookie') =~ /(dancer.session=[^;]+);/;
+		#diag $cookie;
+		#my ($id) = (split /=/, $cookie)[1];
+		#diag $id;
+		#ok -e "sessions/$id.yml";
+		# make sure we have the cookie
+		local $ENV{HTTP_COOKIE} = $cookie;
+		my $r3 = dancer_response GET => '/';
+		like $r3->content, qr{<li><a href="/u/create-post">Create Post</a></li>};
 
-	# post an article  article
-	$cnt++;
-	# just andomly splt up the text to abstract and body
-	my $split = int rand length $text;
-	my $r4 = dancer_response POST => '/u/create-post', {
-		params => {
-			title => "$title ($users[0]{username})",
-			basename => "post-$cnt",
-			abstract => substr($text, 0, $split),
-			body     => substr($text, $split),
-			status   => 'published',
-		},
-	};
-	is $r4->content, 1;
 
+		for my $j (1..3) {
+			# post an article  article
+			$cnt++;
+			# just andomly splt up the text to abstract and body
+			my $split = int rand length $text;
+			my $r4 = dancer_response POST => '/u/create-post', {
+				params => {
+					title => "$title ($users[$i]{username}) [$j]",
+					basename => "post-$cnt",
+					abstract => substr($text, 0, $split),
+					body     => substr($text, $split),
+					status   => 'published',
+				},
+			};
+			is $r4->content, 1;
+		}
+	}
 };
 
 
