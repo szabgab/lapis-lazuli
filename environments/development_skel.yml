@@ -21,5 +21,4 @@ show_errors: 1
 startup_info: 1
 
 blog:
-  #database_name: "ourblog"
-  database_name: "test_1383157573"
+  database_name: "dev_site"
