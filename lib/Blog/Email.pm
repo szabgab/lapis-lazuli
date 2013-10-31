@@ -83,7 +83,7 @@ END_MSG
 
 sub _get_from {
 	my $db = Blog::DB->instance->db;
-	my $config_coll = setting('db')->get_collection('config');
+	my $config_coll = $db->get_collection('config');
 	my $config = $config_coll->find_one({ name => 'site_config' });
 	return if not $config->{from_email};
 	return qq{"$config->{from_name}" <$config->{from_email}>};
