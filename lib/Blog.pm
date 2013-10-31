@@ -365,6 +365,28 @@ get '/tag/:tag' => sub {
 	template 'index', {pages => [map {$_->{id} = $_->{_id}; $_ } $pages->all]};
 };
 
+# TODO move this list in the database and serve the javascript
+# with the same data
+my %accept = map { $_ => 1 } qw(a i);
+post '/u/comment' => sub {
+	my $page_id = params->{page_id};
+	#my $reply_to = params->{reply_to};
+	my $comment = params->{comment_editor}; 
+	return _error('no_comment_text') if not $comment;
+	return _error('missing_post_id') if not $page_id;
+	my $pages_coll = setting('db')->get_collection('pages');
+	my $page  = $pages_coll->find_one({ _id => MongoDB::OID->new(value => $page_id) });
+	return _error('no_such_page') if not $page;
+	my @tags = $comment =~ /<(\w+)/g;
+	foreach my $tag (@tags) {
+		return _error('html_not_accepted', tag => $tag) if not $accept{$tag};
+	}
+
+	#$pages_coll->update({ _id => MongoDB::OID->new(value => $page_id) },
+	#	{ '$push' => ); 
+	return 'OK';
+};
+
 
 get '/u/create-post' => sub {
 	my $id = params->{id};
@@ -552,6 +574,7 @@ get qr{^/users/.*} => sub {
 	$page->{username} = $user->{username};
 	$page->{display_name} = $user->{display_name} || $user->{username};
 	$page->{number_of_comments} = 0;
+	$page->{id} = "$page->{_id}";
 
 	template 'page', {
 		page => $page,
@@ -764,6 +787,33 @@ in their profile:
 
   Allow the user to "Reset Password" by typing in either the username or the e-mail address
   and getting an e-mail with a code including a link to a password reset page. 
+
+=head2 Articles
+
+Each Article has:
+
+  Title:
+  Abstract (text) with HTML editor
+  Body (text) with HTML editor
+  Tags: A comma separated list of values
+  Format: (how the body and extended texts are displayed to the reader)
+    None
+    Markdown
+    Other ideas:
+       Convert Line Breaks
+       Markdown with SmartyPants
+       Rich Text
+       Textile 2
+
+
+
+=head2 Listing posts
+
+The main page lists the N most recent posts. N can be set by the administrator
+and it defaults to 10. If there are more posts a link will be shown at the
+bottom of the page to the next page   /page/2 and so on.
+
+
 
 =cut
 

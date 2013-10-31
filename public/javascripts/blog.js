@@ -46,4 +46,28 @@ $(document).ready(function() {
 			alert('fail');
 		});
 	});
+
+	var accept = { 'a': 1, 'i': 1 };
+	$("#comment_editor").bind('input propertychange', function() {
+		var html = $("#comment_editor").val();
+		var hits = html.match(/<\w+/g);
+		// console.log(hits);
+		var comment_alert = '';
+		if (hits) {
+			for (i=0; i<hits.length; i++) {
+				console.log(hits[i]);
+				tag = hits[i].substr(1);
+				console.log(tag);
+				if (! accept[tag]) {
+					comment_alert = "The tag <b>" + tag + "</b> is not accepted";
+					html = '';
+					break;
+				}
+			}
+		}
+		$("#comment_alert").html(comment_alert);
+		
+		$("#comment_preview").html(html);
+	})
+
 });

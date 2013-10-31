@@ -6,17 +6,12 @@ http://en.wikipedia.org/wiki/Lapis_lazuli
 TODO
 =====
 
-- Add published time stamp to the front page
+- Allow comments on the article specific page
 - Add number of comments (0)
 - In test Generate at least one post without "body"
-- Add Paging to main page (allow the admin to set the page size)
 - Limit the accepted HTML tags and test this
   <b>, <a href=""></a>, <ul>, <ol> <li>
-- Allow comments on the article specific page
 - Add search capability
-
-- On the page of the post add By line
-
 
 
 
@@ -39,20 +34,9 @@ Allow login with some other services:
    Google
    ???
 
+Allow page to be written in Markdown (see format)
 
 
-Create Entry:
-  Title:
-  Body (text) with HTML editor
-  Extended (text) with HTML editor
-  Tags: A comma separated list of values
-  Format: (how the body and extended texts are displayed to the reader)
-    None
-    Convert Line Breaks
-    Markdown
-    Markdown with SmartyPants
-    Rich Text
-    Textile 2
   Publihsing
     Status:
       Published
@@ -96,8 +80,6 @@ Preferences:
   Comments:
     Enable/Disable (for all the posts of this user)
     TBD
-
-
 
 Commenting:
   Just type some text (some HTML might be allowed)

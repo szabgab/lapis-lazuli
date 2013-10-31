@@ -163,4 +163,22 @@ Failed to update the configuration.
 <% END %>
 
 
+<% IF no_comment_text %>
+There was no text in this comment.
+<% END %>
+
+<% IF missing_post_id %>
+There was no original post.
+<% END %>
+
+<% IF no_such_page %>
+The page was not found in the database.
+<% END %>
+
+<% IF html_not_accepted %>
+The tag <b><% tag %></b> is not accepted.
+<% END %>
+
+
+
 

@@ -23,3 +23,20 @@ listing ...
 No comments yet. Be the first to comment!
 <% END %>
 
+<% IF user.display_name %>
+  <div id="comment_editor_form">
+  Type in your comment:
+    <form method="POST" action="/u/comment">
+    <input type="hidden" name="page_id" value="<% page.id %>" />
+    <textarea name="comment_editor" id="comment_editor" rows="20" cols="80">
+    </textarea>
+    <input type="submit" value="Comment" />
+    </form>
+  </div>
+<% ELSE %>
+  You need to be logged in in order to comment.
+<% END %>
+
+<div id="comment_alert"></div>
+<div id="comment_preview"></div>
+

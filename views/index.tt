@@ -32,3 +32,5 @@ No posts yet
 <a href="/page/<% next_page %>">next page (<% next_page %>) -&gt;</a>
 <% END %>
 </div>
+
+
