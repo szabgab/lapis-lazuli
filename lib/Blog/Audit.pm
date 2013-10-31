@@ -4,6 +4,8 @@ use MooX::late;
 #use Types::Standard;
 use MooX::Types::MooseLike::Base qw(Enum);
 
+use Blog::DB;
+
 has user => (is => 'ro', required => 1); #, isa => 'MongoDB::OID'); # MongoID
 has ts   => (is => 'ro', default => sub { time });
 has what => (is => 'ro', required => 1,

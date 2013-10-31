@@ -1,0 +1,11 @@
+<h2>Site Configuration</h2>
+
+<form method="POST">
+ <% FOR c IN site_configuration %>
+   <b><% c.display %></b>
+      <input type="<% c.type %>" name="<% c.name %>" value="<% c.value %>" /></br>
+ <% END %>
+ <input type="submit" value="Update" />
+</form>
+
+

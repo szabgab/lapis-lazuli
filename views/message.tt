@@ -150,3 +150,17 @@ Missing email.
 Invalid email.
 <% END %>
 
+<% IF configuration_updated %>
+Configuration updated.
+<% END %>
+
+<% IF invalid_value %>
+Invalid value for <% field %>.
+<% END %>
+
+<% IF failed_to_update_configuration %>
+Failed to update the configuration.
+<% END %>
+
+
+

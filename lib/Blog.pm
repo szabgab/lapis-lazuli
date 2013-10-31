@@ -13,6 +13,28 @@ use Blog::Audit;
 
 our $VERSION = '0.1';
 
+my @site_configuration = (
+	{
+		display => 'From name',
+		name    => 'from_name',
+		type    => 'text',
+		default => '',
+	},
+	{
+		display => 'From email',
+		name    => 'from_email',
+		type    => 'text',
+		default => '',
+	},
+	{
+		display => 'Page size',
+		name    => 'page_size',
+		type    => 'int',
+		default => 10,
+	},
+);
+
+
 #hook on_route_exception => sub {
 #	my ($context, $error) = @_;
 #	forward '/';
@@ -207,6 +229,10 @@ post '/setup' => sub {
 	$user_data->{admin} = 1;
 	my $user_id    = $users_coll->insert($user_data);
 
+	my %config = map { $_->{name} => $_->{default} } @site_configuration;
+	my $config_coll = setting('db')->get_collection('config');
+	$config_coll->insert({ name => 'site_config', %config });
+
 	#my $pages_coll = setting('db')->get_collection('pages');
 	#$pages_coll->ensure_index({ basename => 1 }, {
 	#	unique => boolean::true,
@@ -383,6 +409,38 @@ get '/u/list-posts' => sub {
 
 	template 'list_pages', {pages => [map {$_->{id} = $_->{_id}; $_ } $all_pages->all]};
 };
+
+get '/a/configuration' => sub {
+	my $config_coll = setting('db')->get_collection('config');
+	my $config = $config_coll->find_one({ name => 'site_config' });
+	foreach my $c (@site_configuration) {
+		$c->{value} = $config->{ $c->{name} } || $c->{default};
+	}
+	template 'site_configuration', { site_configuration => \@site_configuration };
+};
+
+post '/a/configuration' => sub {
+	my $config_coll = setting('db')->get_collection('config');
+
+	my %data;
+	foreach my $c (@site_configuration) {
+		my $value = params->{ $c->{name} };
+		# TODO: validate!
+		if ($c->{type} eq 'int') {
+			if ($value !~ /^\d+$/) {
+				return _error("invalid_value", field => $c->{display});
+			}
+		}
+		$data{ $c->{name} } = $value;
+	}
+	my $ret = $config_coll->update({ name => 'site_config' }, { '$set' => \%data });
+	if (not $ret->{updatedExisting}) {
+		return _error('failed_to_update_configuration');
+	}
+
+	template 'message', { configuration_updated => 1 };
+};
+
 
 get '/a/list-posts' => sub {
 	my $pages_coll = setting('db')->get_collection('pages');

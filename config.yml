@@ -30,8 +30,7 @@ engines:
 session: YAML
 
 blog:
-  database_name: "ourblogx"
   database_host: "localhost:27017"
-
+#   database_name: "ourblog"
 
 

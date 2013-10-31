@@ -19,3 +19,7 @@ show_errors: 1
 
 # print the banner
 startup_info: 1
+
+blog:
+  #database_name: "ourblog"
+  database_name: "test_1383157573"

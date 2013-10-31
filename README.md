@@ -9,18 +9,13 @@ TODO
 - Add published time stamp to the front page
 - Add number of comments (0)
 - In test Generate at least one post without "body"
-- Add Paging to main page
-- Limit the acceptad HTML tags and test this
+- Add Paging to main page (allow the admin to set the page size)
+- Limit the accepted HTML tags and test this
   <b>, <a href=""></a>, <ul>, <ol> <li>
 - Allow comments on the article specific page
 - Add search capability
 
 - On the page of the post add By line
-
-
-
-
-
 
 
 
@@ -55,7 +50,7 @@ Create Entry:
     None
     Convert Line Breaks
     Markdown
-    Markdown with SmaryPants
+    Markdown with SmartyPants
     Rich Text
     Textile 2
   Publihsing
@@ -117,13 +112,6 @@ Search: full textsearch on the posts and comments
 
 Layout of the reader pages:
 Main page:  On the main page a list of articles:
-  <% title %>
-  By <% author%> on <% date %>
-  <% abstract %>
-
-  <a href=""><% number_of_comments %> comments</a> 
-  <a href="">Continue reading</a>
-    (or Permalink if the extended part was empty)
 
   At the bottom of the page one can click on
   Page 2  that leads to /page/2
@@ -142,7 +130,6 @@ The Permalink of each post is
    #comments is the anchor to the top of the comments
    Each comment has an achon #comment-COMMENTID
    (the commentid is a number)
-
 
 Feeds:
 

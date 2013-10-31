@@ -27,7 +27,7 @@
         <li>
           <h3>Join the community</h3>
           <ul class="links">
-	  	    <% IF user.display_name %>
+            <% IF user.display_name %>
               <li><% user.display_name %></li>
               <li><a href="/logout">Log Out</a></li>
               <li><a href="/u/create-post">Create Post</a></li>
@@ -45,6 +45,7 @@
               <li><a href="/a/list-users">List Users</a></li>
               <li><a href="/a/list-posts">List Posts</a></li>
               <li><a href="/a/audit">Audit trail</a></li>
+              <li><a href="/a/configuration">Configuration</a></li>
             </ul>
           <% END %>
         </li>

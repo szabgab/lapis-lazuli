@@ -2,13 +2,13 @@ package Blog::Email;
 use Moo;
 
 use Data::Dumper qw(Dumper);
-
-has url => (is => 'ro', required => 1);
-
-
 use Email::Sender::Simple qw(sendmail);
 use Email::Simple;
 #use Email::Simple::Creator;
+
+use Blog::DB;
+
+has url => (is => 'ro', required => 1);
 
 =pod
 
@@ -30,6 +30,8 @@ sub send_validation_code {
 	my $url = $self->url;
 	#die Dumper \%data;
 
+	my $from = _get_from() or return;
+
 	my $body = <<"END_MSG";
 Hi,
 
@@ -41,7 +43,7 @@ END_MSG
 	my $email = Email::Simple->create(
 		header => [
 			To    => qq{"$data{name}" <$data{email}{email}>}, 
-			From  => '<gabor@perlmaven.com>',
+			From  => $from,
 			Subject => "Please validate your e-mail address",
 		],
 		body => $body,
@@ -55,6 +57,8 @@ sub send_password_set_code {
 	my ($self, %data) = @_;
 
 	my $url = $self->url;
+
+	my $from = _get_from() or return;
 
 	my $body = <<"END_MSG";
 Hi,
@@ -76,6 +80,15 @@ END_MSG
 	return if $ENV{TEST_HOST};
 	sendmail($email);
 }
+
+sub _get_from {
+	my $db = Blog::DB->instance->db;
+	my $config_coll = setting('db')->get_collection('config');
+	my $config = $config_coll->find_one({ name => 'site_config' });
+	return if not $config->{from_email};
+	return qq{"$config->{from_name}" <$config->{from_email}>};
+}
+
 
 
 1;
