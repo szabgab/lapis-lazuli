@@ -144,7 +144,8 @@ END_TEXT
 # Source: http://www.lipsum.com/
 
 subtest '/u/create-post' => sub {
-	plan tests => 6 * @users;
+	my $N = 4;
+	plan tests => @users * (3 + $N);
 	my $cnt = 0;
 
 	foreach my $i (0 .. @users-1) {
@@ -171,11 +172,14 @@ subtest '/u/create-post' => sub {
 		like $r3->content, qr{<li><a href="/u/create-post">Create Post</a></li>};
 
 
-		for my $j (1..3) {
+		for my $j (1 .. $N) {
 			# post an article  article
 			$cnt++;
 			# just andomly splt up the text to abstract and body
 			my $split = int rand length $text;
+			if ($j == 1) {
+				$split = length $text;
+			}
 			my $r4 = dancer_response POST => '/u/create-post', {
 				params => {
 					title => "$title ($users[$i]{username}) [$j]",
@@ -186,6 +190,7 @@ subtest '/u/create-post' => sub {
 				},
 			};
 			is $r4->content, 1;
+			sleep 1; # wait so the time stamps will be really different
 		}
 	}
 };

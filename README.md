@@ -6,8 +6,6 @@ http://en.wikipedia.org/wiki/Lapis_lazuli
 TODO
 =====
 
-- Allow comments on the article specific page
-- Add number of comments (0)
 - In test Generate at least one post without "body"
 - Limit the accepted HTML tags and test this
   <b>, <a href=""></a>, <ul>, <ol> <li>

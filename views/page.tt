@@ -15,18 +15,24 @@
 </ul>
 </div>
 
-<h2 id="comments"><% page.number_of_comments %> Comments</h2>
+<div id="comments">
+<h2><% page.number_of_comments %> Comments</h2>
 
 <% IF page.number_of_comments %>
   <% FOR c IN page.comments %>
-     By <% c.user %> on <% c.timestamp %><br>
-     <div class="comment">
-     <% c.text %>
+     <div class="comment comment_<% c.id %>">
+       <div class="comment_by">
+         By <% c.user %> on <% c.timestamp %>
+       </div>
+       <div class="comment_text">
+         <% c.text %>
+       </div>
      </div>
   <% END %>
 <% ELSE %>
 No comments yet. Be the first to comment!
 <% END %>
+</div>
 
 <% IF user.display_name %>
   <div id="comment_editor_form">
@@ -40,6 +46,7 @@ No comments yet. Be the first to comment!
 <% ELSE %>
   You need to be logged in in order to comment.
 <% END %>
+
 
 <div id="comment_alert"></div>
 <div id="comment_preview"></div>

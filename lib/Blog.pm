@@ -266,6 +266,7 @@ post '/setup' => sub {
 	my %config = map { $_->{name} => $_->{default} } @site_configuration;
 	my $config_coll = setting('db')->get_collection('config');
 	$config_coll->insert({ name => 'site_config', %config });
+	$config_coll->insert({ _id => 'comment_id', seq => 0 });
 
 	#my $pages_coll = setting('db')->get_collection('pages');
 	#$pages_coll->ensure_index({ basename => 1 }, {
@@ -275,6 +276,16 @@ post '/setup' => sub {
 	template 'message', { welcome => 1, show_sidebar => 1 };
 	#redirect '/';
 };
+
+sub get_next {
+	my ($field) = @_;
+	my $config_coll = setting('db')->get_collection('config');
+	return $config_coll->find_and_modify( {
+		query  => { _id => $field },
+		update => { '$inc' => { seq => 1 } },
+		new  => 1,
+	} )->{seq}
+}
 
 post '/register' => sub {
 	my $user_data = _check_new_user();
@@ -386,6 +397,7 @@ post '/u/comment' => sub {
 		{
 			'$push' => {
 				comments => {
+					id        => get_next('comment_id'),
 					user      => session('user_id'),
 					text      => $comment,
 					timestamp => DateTime->now,
@@ -814,7 +826,9 @@ Each Article has:
        Rich Text
        Textile 2
 
+=head2 Comment
 
+Allow comments on the article specific pages.
 
 =head2 Listing posts
 
