@@ -34,6 +34,12 @@ my @site_configuration = (
 	},
 );
 
+sub _site_config {
+	my $db = Blog::DB->instance->db;
+	my $config_coll = setting('db')->get_collection('config');
+	return $config_coll->find_one({ name => 'site_config' });
+}
+
 
 #hook on_route_exception => sub {
 #	my ($context, $error) = @_;
@@ -184,7 +190,13 @@ get '/message/:code' => sub {
 any ['get', 'post'] => '/' => sub {
 	my $pages_coll = setting('db')->get_collection('pages');
 	my $users_coll = setting('db')->get_collection('users');
-	my $all_pages = $pages_coll->find( { status => 'published' } );
+	my $page = 1;
+	my $page_size = _site_config->{page_size};
+	my $all_pages = $pages_coll
+			->find( { status => 'published' } )
+			->sort( { created_timestamp => -1} )
+			->skip( ($page-1)*$page_size )
+			->limit( $page_size );
 	my @pages;
 	while (my $p = $all_pages->next) {
 		$p->{id} = $p->{_id};
@@ -383,7 +395,9 @@ post '/u/create-post' => sub {
 		return 1;
 	}
 
-	# TODO: add published_timestamp
+	if (not $data{published_timestamp} and $data{status} eq 'published') {
+		$data{published_timestamp} = DateTime->now;
+	}
 
 	# New post
 	my $users_coll = setting('db')->get_collection('users');
