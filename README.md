@@ -119,7 +119,7 @@ Main page:  On the main page a list of articles:
 
   /page/1 is also available but IMHO should redirect to the
     main page
-  Goes all the way to /page/563 showing thevery first entry.
+  Goes all the way to /page/567 showing thevery first entry.
 
 
 The Permalink of each post is

@@ -188,17 +188,33 @@ get '/message/:code' => sub {
 };
 
 any ['get', 'post'] => '/' => sub {
+	_show_page(1);
+};
+
+get '/page/:n' => sub {
+	my $page = params->{n};
+	pass if $page  !~ /^\d+$/;
+	redirect '/' if $page == 1;
+	_show_page($page);
+};
+
+sub _show_page {
+	my ($page) = @_;
+
 	my $pages_coll = setting('db')->get_collection('pages');
 	my $users_coll = setting('db')->get_collection('users');
-	my $page = 1;
 	my $page_size = _site_config->{page_size};
-	my $all_pages = $pages_coll
+	my $document_count = $pages_coll->find( { status => 'published' } )->count;
+
+	pass if $page > 1 and $document_count <= ($page-1)*$page_size;
+
+	my $pages = $pages_coll
 			->find( { status => 'published' } )
 			->sort( { created_timestamp => -1} )
 			->skip( ($page-1)*$page_size )
 			->limit( $page_size );
 	my @pages;
-	while (my $p = $all_pages->next) {
+	while (my $p = $pages->next) {
 		$p->{id} = $p->{_id};
 		my $user = $users_coll->find_one({ _id => $p->{author_id} });
 		$p->{username}     = $user->{username};
@@ -206,8 +222,14 @@ any ['get', 'post'] => '/' => sub {
 		$p->{number_of_comments} = 0;
 		push @pages, $p;
 	 };
-	template 'index', {pages => \@pages};
+	template 'index', {
+		pages     => \@pages,
+		this_page => $page,
+		prev_page => $page-1,
+		next_page => ($document_count <= $page*$page_size ? 0 : $page+1),
+	};
 };
+
 
 get '/register' => sub {
 	template 'register';
