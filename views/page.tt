@@ -15,10 +15,15 @@
 </ul>
 </div>
 
-<h2 id="comments">Comments</h2>
+<h2 id="comments"><% page.number_of_comments %> Comments</h2>
 
-<% IF number_of_comments %>
-listing ...
+<% IF page.number_of_comments %>
+  <% FOR c IN page.comments %>
+     By <% c.user %> on <% c.timestamp %><br>
+     <div class="comment">
+     <% c.text %>
+     </div>
+  <% END %>
 <% ELSE %>
 No comments yet. Be the first to comment!
 <% END %>
@@ -28,8 +33,7 @@ No comments yet. Be the first to comment!
   Type in your comment:
     <form method="POST" action="/u/comment">
     <input type="hidden" name="page_id" value="<% page.id %>" />
-    <textarea name="comment_editor" id="comment_editor" rows="20" cols="80">
-    </textarea>
+    <textarea name="comment_editor" id="comment_editor" rows="20" cols="80"></textarea>
     <input type="submit" value="Comment" />
     </form>
   </div>

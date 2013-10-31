@@ -214,13 +214,13 @@ sub _show_page {
 			->skip( ($page-1)*$page_size )
 			->limit( $page_size );
 	my @pages;
-	while (my $p = $pages->next) {
-		$p->{id} = $p->{_id};
-		my $user = $users_coll->find_one({ _id => $p->{author_id} });
-		$p->{username}     = $user->{username};
-		$p->{display_name} = $user->{display_name} || $user->{username};
-		$p->{number_of_comments} = 0;
-		push @pages, $p;
+	while (my $page = $pages->next) {
+		$page->{id} = $page->{_id};
+		my $user = $users_coll->find_one({ _id => $page->{author_id} });
+		$page->{username}     = $user->{username};
+		$page->{display_name} = $user->{display_name} || $user->{username};
+		$page->{number_of_comments} = @{ $page->{comments} || [] };
+		push @pages, $page;
 	 };
 	template 'index', {
 		pages     => \@pages,
@@ -382,9 +382,18 @@ post '/u/comment' => sub {
 		return _error('html_not_accepted', tag => $tag) if not $accept{$tag};
 	}
 
-	#$pages_coll->update({ _id => MongoDB::OID->new(value => $page_id) },
-	#	{ '$push' => ); 
-	return 'OK';
+	$pages_coll->update({ _id => MongoDB::OID->new(value => $page_id) },
+		{
+			'$push' => {
+				comments => {
+					user      => session('user_id'),
+					text      => $comment,
+					timestamp => DateTime->now,
+					# TODO: response__to => comment id
+				}
+			}
+		}); 
+	redirect $page->{permalink};
 };
 
 
@@ -560,7 +569,7 @@ get '/users/:username/:page' => sub {
 
 		return template 'profile', { the_user => $user };
 	}
-	return _error('not_implemented');
+	pass; #return _error('not_implemented');
 };
 
 get qr{^/users/.*} => sub {
@@ -573,7 +582,7 @@ get qr{^/users/.*} => sub {
 	my $user  = $users_coll->find_one({ _id => $page->{author_id} });
 	$page->{username} = $user->{username};
 	$page->{display_name} = $user->{display_name} || $user->{username};
-	$page->{number_of_comments} = 0;
+	$page->{number_of_comments} = @{ $page->{comments} || [] };
 	$page->{id} = "$page->{_id}";
 
 	template 'page', {
