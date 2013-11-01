@@ -108,6 +108,7 @@ hook before_template => sub {
 		$t->{show_sidebar} = 1;
 	}
 	$t->{accepted_html_tags} = to_json accepted_html_tags();
+	$t->{query} = params->{query};
 
 	return;
 };
@@ -210,22 +211,11 @@ get '/page/:n' => sub {
 sub _show_page {
 	my ($this_page) = @_;
 
-	my $pages_coll = setting('db')->get_collection('pages');
-	my $page_size = _site_config->{page_size};
 	my %query = (
 		status => 'published',
 	);
-	my $document_count = $pages_coll->find( \%query )->count;
 
-	pass if $this_page > 1 and $document_count <= ($this_page-1)*$page_size;
-
-	my $pages = $pages_coll
-			->find( \%query )
-			->sort( { created_timestamp => -1} )
-			->skip( ($this_page-1)*$page_size )
-			->limit( $page_size );
-
-	_list_pages($pages, $this_page, $document_count);
+	_list_pages($this_page, \%query);
 }
 
 get '/search' => sub {
@@ -233,28 +223,31 @@ get '/search' => sub {
 	my $this_page  = params->{page} || 1;
 	# TODO check input
 
-	my $pages_coll = setting('db')->get_collection('pages');
-	my $page_size = _site_config->{page_size};
 	my %query = (
 		status => 'published', 
 		abstract => { '$regex' => $query },
 	);
-	my $document_count = $pages_coll->find( \%query )->count;
 
-	pass if $this_page > 1 and $document_count <= ($this_page-1)*$page_size;
-
-	my $pages = $pages_coll
-		->find( \%query )
-		->sort( { created_timestamp => -1} )
-		->skip( ($this_page-1)*$page_size )
-		->limit( $page_size );
-
-	_list_pages($pages, $this_page, $document_count);
+	_list_pages($this_page, \%query);
 };
 
 
 sub _list_pages {
-	my ($pages, $this_page, $document_count) = @_;
+	my ($this_page, $query) = @_;
+
+
+	my $pages_coll = setting('db')->get_collection('pages');
+	my $page_size = _site_config->{page_size};
+	my $document_count = $pages_coll->find( $query )->count;
+
+	pass if $this_page > 1 and $document_count <= ($this_page-1)*$page_size;
+
+	my $pages = $pages_coll
+		->find( $query )
+		->sort( { created_timestamp => -1} )
+		->skip( ($this_page-1)*$page_size )
+		->limit( $page_size );
+
 
 	my $page_size = _site_config->{page_size};
 	my $users_coll = setting('db')->get_collection('users');
