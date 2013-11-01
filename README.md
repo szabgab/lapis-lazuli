@@ -6,13 +6,12 @@ http://en.wikipedia.org/wiki/Lapis_lazuli
 TODO
 =====
 
-- Add search capability
+- Add paging to search capability and to the listing of entries per a tag.
+
 
 - Allow editing a comment (maybe for a limted time?)
 
-
-
-
+Allow page to be written in Markdown (see format)
 
 
 
@@ -35,7 +34,6 @@ Allow login with some other services:
    Google
    ???
 
-Allow page to be written in Markdown (see format)
 
 
   Publihsing

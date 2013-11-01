@@ -13,6 +13,10 @@ var accepted_html_tags = <% accepted_html_tags %>;
 <form id="post_form" method="POST">
  <b>Title:</b><input name="title" id="title" value="<% page.title %>" /></br>
  <b>Basename:</b><input name="basename" id="basename" value="<% page.basename %>" /> Unlock: <input name="basename_lock" id="basename_lock" type="checkbox"></br>
+ Format: <select name="format" id="format">
+  <option value="html" <% IF page.status == 'html' %>selected="SELECTED"<% END %> >HTML</option>
+  <option value="markdown" <% IF page.status == 'markdown' %>selected="SELECTED"<% END %> >Markdown</option>
+ </select>
  <b>Abstract:</b><br>
  <textarea name="abstract" rows="10" cols="80" /><% page.abstract %></textarea><br>
  <b>Body:</b><br>

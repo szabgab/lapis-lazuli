@@ -13,6 +13,10 @@ use Blog::Audit;
 
 our $VERSION = '0.1';
 
+if ($ENV{HARNESS_ACTIVE}) {
+	set log  => "warning";
+}
+
 my @site_configuration = (
 	{
 		display => 'From name',
@@ -44,7 +48,8 @@ sub _site_config {
 	my $db = Blog::DB->instance->db;
 	my $config_coll = setting('db')->get_collection('config');
 	my %defaults = map { $_->{name} => $_->{default} } @site_configuration;
-	my %config = (%defaults, %{ $config_coll->find_one({ _id => 'site_config' }) });
+	my $cfg = $config_coll->find_one({ _id => 'site_config' }) || {};
+	my %config = (%defaults, %$cfg);
 	return \%config;
 }
 
@@ -252,7 +257,6 @@ sub _list_pages {
 		->limit( $page_size );
 
 
-	my $page_size = _site_config->{page_size};
 	my $users_coll = setting('db')->get_collection('users');
 	my @pages;
 	while (my $page = $pages->next) {
@@ -490,7 +494,7 @@ post '/u/create-post' => sub {
 		%data = %$page;
 	}
 
-	$data{$_} = params->{$_} for qw(title basename abstract body status);
+	$data{$_} = params->{$_} for qw(title basename abstract body status fromat);
 	my $tags = params->{tags};
 	if ($tags) {
 		$data{tags} = [ map { s{^\s+|\s+$}{}; $_ } split /,/, $tags ];
