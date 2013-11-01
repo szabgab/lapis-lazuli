@@ -198,25 +198,25 @@ get '/message/:code' => sub {
 };
 
 any ['get', 'post'] => '/' => sub {
-	_show_page(1);
+	my %query = (
+		status => 'published',
+	);
+
+	_list_pages(1, \%query);
+
 };
 
 get '/page/:n' => sub {
-	my $page = params->{n};
-	pass if $page  !~ /^\d+$/;
-	redirect '/' if $page == 1;
-	_show_page($page);
-};
-
-sub _show_page {
-	my ($this_page) = @_;
+	my $this_page = params->{n};
+	pass if $this_page  !~ /^\d+$/;
+	redirect '/' if $this_page == 1;
 
 	my %query = (
 		status => 'published',
 	);
 
 	_list_pages($this_page, \%query);
-}
+};
 
 get '/search' => sub {
 	my $query = params->{query};
