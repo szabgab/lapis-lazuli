@@ -225,7 +225,10 @@ get '/search' => sub {
 
 	my %query = (
 		status => 'published', 
-		abstract => { '$regex' => $query },
+		'$or' => [
+			{ abstract => { '$regex' => $query } },
+			{ body => { '$regex' => $query } },
+		],
 	);
 
 	_list_pages($this_page, \%query);
@@ -891,6 +894,10 @@ Default is: a, b, i, ul, ol, li
 The main page lists the N most recent posts. N can be set by the administrator
 and it defaults to 10. If there are more posts a link will be shown at the
 bottom of the page to the next page   /page/2 and so on.
+
+
+=head2 Search
+
 
 
 

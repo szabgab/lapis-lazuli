@@ -15,6 +15,9 @@ TODO
 
 
 
+
+
+
 - When deleting a user ask for confirmation
   and remove all the posts and comments the user made.
 - Allow disabling users (by administrators)
