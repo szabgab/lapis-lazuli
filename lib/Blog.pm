@@ -207,20 +207,28 @@ get '/page/:n' => sub {
 };
 
 sub _show_page {
-	my ($page) = @_;
+	my ($this_page) = @_;
 
 	my $pages_coll = setting('db')->get_collection('pages');
-	my $users_coll = setting('db')->get_collection('users');
 	my $page_size = _site_config->{page_size};
 	my $document_count = $pages_coll->find( { status => 'published' } )->count;
 
-	pass if $page > 1 and $document_count <= ($page-1)*$page_size;
+	pass if $this_page > 1 and $document_count <= ($this_page-1)*$page_size;
 
 	my $pages = $pages_coll
 			->find( { status => 'published' } )
 			->sort( { created_timestamp => -1} )
-			->skip( ($page-1)*$page_size )
+			->skip( ($this_page-1)*$page_size )
 			->limit( $page_size );
+
+	_list_pages($pages, $this_page, $document_count);
+}
+
+sub _list_pages {
+	my ($pages, $this_page, $document_count) = @_;
+
+	my $page_size = _site_config->{page_size};
+	my $users_coll = setting('db')->get_collection('users');
 	my @pages;
 	while (my $page = $pages->next) {
 		$page->{id} = $page->{_id};
@@ -232,11 +240,26 @@ sub _show_page {
 	 };
 	template 'index', {
 		pages     => \@pages,
-		this_page => $page,
-		prev_page => $page-1,
-		next_page => ($document_count <= $page*$page_size ? 0 : $page+1),
+		this_page => $this_page,
+		prev_page => $this_page-1,
+		next_page => ($document_count <= $this_page*$page_size ? 0 : $this_page+1),
 	};
 };
+
+#get '/search' => sub {
+#	my $query = params->{query};
+#	my $page  = params->{page};
+#	# TODO check input
+#
+#	my $pages_coll = setting('db')->get_collection('pages');
+#	my $page_size = _site_config->{page_size};
+#
+#	my $pages = $pages_coll
+#		->find( { status => 'published', '$regex' => { abstract => $query } } )
+#		->sort( { created_timestamp => -1} )
+#	#	->skip( ($page-1)*$page_size )
+#		->limit( $page_size );
+#};
 
 
 get '/register' => sub {
