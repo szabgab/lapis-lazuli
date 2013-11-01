@@ -2,6 +2,32 @@
 function update_basename() {
 }
 
+function editor_preview() {
+	var abstract_html = $("#abstract_editor").val();
+	var body_html     = $("#body_editor").val();
+
+	var html = abstract_html + ' ' + body_html;
+	var hits = html.match(/<\w+/g);
+	// console.log(hits);
+	var editor_alert = '';
+	if (hits) {
+		for (i=0; i<hits.length; i++) {
+			//console.log(hits[i]);
+			tag = hits[i].substr(1);
+			//console.log(tag);
+			if (! accepted_html_tags[tag]) {
+				editor_alert = "The tag <b>" + tag + "</b> is not accepted";
+				html = '';
+				break;
+			}
+		}
+	}
+	$("#editor_alert").html(editor_alert);
+
+	$("#editor_preview").html(html);
+}
+
+
 $(document).ready(function() {
 	//console.log('ready');
 	$("#basename").prop('disabled', true);
@@ -67,6 +93,14 @@ $(document).ready(function() {
 		$("#comment_alert").html(comment_alert);
 		
 		$("#comment_preview").html(html);
-	})
+	});
+
+	$("#abstract_editor").bind('input propertychange', function() {
+		editor_preview();
+	});
+
+	$("#body_editor").bind('input propertychange', function() {
+		editor_preview();
+	});
 
 });

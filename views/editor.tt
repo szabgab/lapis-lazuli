@@ -13,19 +13,33 @@ var accepted_html_tags = <% accepted_html_tags %>;
 <form id="post_form" method="POST">
  <b>Title:</b><input name="title" id="title" value="<% page.title %>" /></br>
  <b>Basename:</b><input name="basename" id="basename" value="<% page.basename %>" /> Unlock: <input name="basename_lock" id="basename_lock" type="checkbox"></br>
- Format: <select name="format" id="format">
+ Format:
+<select name="format" id="format">
   <option value="html" <% IF page.status == 'html' %>selected="SELECTED"<% END %> >HTML</option>
   <option value="markdown" <% IF page.status == 'markdown' %>selected="SELECTED"<% END %> >Markdown</option>
- </select>
+</select>
+<br>
+
  <b>Abstract:</b><br>
- <textarea name="abstract" rows="10" cols="80" /><% page.abstract %></textarea><br>
+ <textarea name="abstract" id="abstract_editor" rows="10" cols="80" /><% page.abstract %></textarea><br>
+
  <b>Body:</b><br>
- <textarea name="body" rows="10" cols="80" /><% page.body %></textarea><br>
- <b>Tags:</b><input name="tags" id="tags" value="<% page.tags %>" /></br>
+ <textarea name="body" id="body_editor" rows="10" cols="80" /><% page.body %></textarea><br>
+
+ <b>Tags:</b><br>
+ <input size="80" name="tags" id="tags" value="<% page.tags %>" /></br>
+
  Status: <select name="status" id="status">
   <option value="draft" <% IF page.status == 'draft' %>selected="SELECTED"<% END %> >Draft</option>
   <option value="published" <% IF page.status == 'published' %>selected="SELECTED"<% END %> >Published</option>
  </select>
+ <br>
  <input type="hidden" name="id"  value="<% page.id %>" />
  <input type="button" id="submit" value="Save" />
 </form>
+
+<div id="editor_alert"></div>
+
+<h2>Preview</h2>
+<div id="editor_preview"></div>
+
