@@ -8,6 +8,9 @@ TODO
 
 - Add search capability
 
+- Allow editing a comment (maybe for a limted time?)
+
+
 
 
 

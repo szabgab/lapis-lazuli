@@ -48,6 +48,19 @@
               <li><a href="/a/configuration">Configuration</a></li>
             </ul>
           <% END %>
+          <form action="/search">
+          <input name="query" value="<% query %>" />
+<!--
+          <input type="hidden" id="user_id" value="<% post.user_id %>" />
+          <select name="search_target">
+             <option value="all" <% IF page.status == 'all' %>selected="SELECTED"<% END %> >All</option>
+             <option value="this" <% IF page.status == 'this' %>selected="SELECTED"<% END %> >This user</option>
+  
+          </select>
+
+-->
+          <input type="submit" value="Search" />
+          </form>
         </li>
       </ul>
     </div>

@@ -12,12 +12,12 @@ $(document).ready(function() {
 	$("#title").on('change, keyup paste', function() {
 		// if basename is not locked
 		if ( $("#basename_lock").is(':checked') ) {
-			return;
+			return False;
 		}
 
 		// if status is published, do not change the basename
 		if ( $("#status").val() == 'published' ) {
-			return;
+			return False;
 		}
 		// TODO we should probably make sure the basename cannot be changed
 		// at all after the article was published.

@@ -107,6 +107,7 @@ hook before_template => sub {
 	unless (request->path =~ m{^/setup}) {
 		$t->{show_sidebar} = 1;
 	}
+	$t->{accepted_html_tags} = to_json accepted_html_tags();
 
 	return;
 };
@@ -211,18 +212,46 @@ sub _show_page {
 
 	my $pages_coll = setting('db')->get_collection('pages');
 	my $page_size = _site_config->{page_size};
-	my $document_count = $pages_coll->find( { status => 'published' } )->count;
+	my %query = (
+		status => 'published',
+	);
+	my $document_count = $pages_coll->find( \%query )->count;
 
 	pass if $this_page > 1 and $document_count <= ($this_page-1)*$page_size;
 
 	my $pages = $pages_coll
-			->find( { status => 'published' } )
+			->find( \%query )
 			->sort( { created_timestamp => -1} )
 			->skip( ($this_page-1)*$page_size )
 			->limit( $page_size );
 
 	_list_pages($pages, $this_page, $document_count);
 }
+
+get '/search' => sub {
+	my $query = params->{query};
+	my $this_page  = params->{page} || 1;
+	# TODO check input
+
+	my $pages_coll = setting('db')->get_collection('pages');
+	my $page_size = _site_config->{page_size};
+	my %query = (
+		status => 'published', 
+		abstract => { '$regex' => $query },
+	);
+	my $document_count = $pages_coll->find( \%query )->count;
+
+	pass if $this_page > 1 and $document_count <= ($this_page-1)*$page_size;
+
+	my $pages = $pages_coll
+		->find( \%query )
+		->sort( { created_timestamp => -1} )
+		->skip( ($this_page-1)*$page_size )
+		->limit( $page_size );
+
+	_list_pages($pages, $this_page, $document_count);
+};
+
 
 sub _list_pages {
 	my ($pages, $this_page, $document_count) = @_;
@@ -245,21 +274,6 @@ sub _list_pages {
 		next_page => ($document_count <= $this_page*$page_size ? 0 : $this_page+1),
 	};
 };
-
-#get '/search' => sub {
-#	my $query = params->{query};
-#	my $page  = params->{page};
-#	# TODO check input
-#
-#	my $pages_coll = setting('db')->get_collection('pages');
-#	my $page_size = _site_config->{page_size};
-#
-#	my $pages = $pages_coll
-#		->find( { status => 'published', '$regex' => { abstract => $query } } )
-#		->sort( { created_timestamp => -1} )
-#	#	->skip( ($page-1)*$page_size )
-#		->limit( $page_size );
-#};
 
 
 get '/register' => sub {
@@ -453,7 +467,6 @@ get '/u/create-post' => sub {
 		}
 		return template 'editor', {
 			page => $page,
-			accepted_html_tags => to_json accepted_html_tags(),
 		};
 	}
 	template 'editor';
@@ -631,7 +644,6 @@ get qr{^/users/.*} => sub {
 
 	template 'page', {
 		page => $page,
-		accepted_html_tags => to_json accepted_html_tags(),
 	}
 };
 
