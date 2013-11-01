@@ -32,12 +32,20 @@ my @site_configuration = (
 		type    => 'int',
 		default => 10,
 	},
+	{
+		display => 'Accepted HTML tags',
+		name    => 'accepted_html_tags',
+		type    => 'text',
+		default => 'a, b, i, ul, ol, li',
+	},
 );
 
 sub _site_config {
 	my $db = Blog::DB->instance->db;
 	my $config_coll = setting('db')->get_collection('config');
-	return $config_coll->find_one({ name => 'site_config' });
+	my %defaults = map { $_->{name} => $_->{default} } @site_configuration;
+	my %config = (%defaults, %{ $config_coll->find_one({ _id => 'site_config' }) });
+	return \%config;
 }
 
 
@@ -263,9 +271,8 @@ post '/setup' => sub {
 	$user_data->{admin} = 1;
 	my $user_id    = $users_coll->insert($user_data);
 
-	my %config = map { $_->{name} => $_->{default} } @site_configuration;
 	my $config_coll = setting('db')->get_collection('config');
-	$config_coll->insert({ name => 'site_config', %config });
+	$config_coll->insert({ _id => 'site_config' });
 	$config_coll->insert({ _id => 'comment_id', seq => 0 });
 
 	#my $pages_coll = setting('db')->get_collection('pages');
@@ -376,9 +383,6 @@ get '/tag/:tag' => sub {
 	template 'index', {pages => [map {$_->{id} = $_->{_id}; $_ } $pages->all]};
 };
 
-# TODO move this list in the database and serve the javascript
-# with the same data
-my %accept = map { $_ => 1 } qw(a i);
 post '/u/comment' => sub {
 	my $page_id = params->{page_id};
 	#my $reply_to = params->{reply_to};
@@ -388,9 +392,11 @@ post '/u/comment' => sub {
 	my $pages_coll = setting('db')->get_collection('pages');
 	my $page  = $pages_coll->find_one({ _id => MongoDB::OID->new(value => $page_id) });
 	return _error('no_such_page') if not $page;
+
 	my @tags = $comment =~ /<(\w+)/g;
+	my $accept = accepted_html_tags();
 	foreach my $tag (@tags) {
-		return _error('html_not_accepted', tag => $tag) if not $accept{$tag};
+		return _error('html_not_accepted', tag => $tag) if not $accept->{$tag};
 	}
 
 	$pages_coll->update({ _id => MongoDB::OID->new(value => $page_id) },
@@ -422,7 +428,10 @@ get '/u/create-post' => sub {
 		if ($page->{tags}) {
 			$page->{tags} = join ', ', @{ $page->{tags} };
 		}
-		return template 'editor', { page => $page };
+		return template 'editor', {
+			page => $page,
+			accepted_html_tags => to_json accepted_html_tags(),
+		};
 	}
 	template 'editor';
 };
@@ -491,7 +500,7 @@ get '/u/list-posts' => sub {
 
 get '/a/configuration' => sub {
 	my $config_coll = setting('db')->get_collection('config');
-	my $config = $config_coll->find_one({ name => 'site_config' });
+	my $config = $config_coll->find_one({ _id => 'site_config' });
 	foreach my $c (@site_configuration) {
 		$c->{value} = $config->{ $c->{name} } || $c->{default};
 	}
@@ -512,7 +521,7 @@ post '/a/configuration' => sub {
 		}
 		$data{ $c->{name} } = $value;
 	}
-	my $ret = $config_coll->update({ name => 'site_config' }, { '$set' => \%data });
+	my $ret = $config_coll->update({ _id => 'site_config' }, { '$set' => \%data });
 	if (not $ret->{updatedExisting}) {
 		return _error('failed_to_update_configuration');
 	}
@@ -599,6 +608,7 @@ get qr{^/users/.*} => sub {
 
 	template 'page', {
 		page => $page,
+		accepted_html_tags => to_json accepted_html_tags(),
 	}
 };
 
@@ -649,6 +659,15 @@ get '/a/delete-user' => sub {
 	#$user->delete;
 	template 'message', { user_deleted => 1 };
 };
+
+# returns a hash reference
+sub accepted_html_tags {
+	return {
+		map { $_ => 1 }
+			split /\s*,\s*/, _site_config->{accepted_html_tags}
+	};
+}
+
 
 sub _error {
 	my ($code, %args) = @_;
@@ -712,6 +731,7 @@ sub logged_in {
 	session last_seen => time;
 	return 1;
 }
+
 
 true;
 
@@ -829,6 +849,14 @@ Each Article has:
 =head2 Comment
 
 Allow comments on the article specific pages.
+
+
+=head2 HTML tags
+
+Limit the accepted HTML tags, check this limitation both in
+JavaScript during the editing phase and then on submission.
+Allow the administrator to set the accepted list of tags.
+Default is: a, b, i, ul, ol, li
 
 =head2 Listing posts
 

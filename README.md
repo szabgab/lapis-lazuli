@@ -6,9 +6,6 @@ http://en.wikipedia.org/wiki/Lapis_lazuli
 TODO
 =====
 
-- In test Generate at least one post without "body"
-- Limit the accepted HTML tags and test this
-  <b>, <a href=""></a>, <ul>, <ol> <li>
 - Add search capability
 
 
