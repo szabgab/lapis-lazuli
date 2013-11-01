@@ -13,8 +13,11 @@ TODO
 
 Allow page to be written in Markdown (see format)
 
+<link rel=alternate type="application/atom+xml" title=Entries href="<% request.uri_base %>/atom.xml">
+<link rel=alternate type="application/atom+xml" title=Comments href="<% request.uri_base %>/comments.xml">
 
-
+For pages of individual users (and posts by users)
+<link rel="alternate" type="application/atom+xml" title="Entries" href="<% request.uri_base %>/users/<% username %>/atom.xml" />
 
 
 - When deleting a user ask for confirmation

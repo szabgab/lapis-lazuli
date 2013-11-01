@@ -118,6 +118,44 @@ hook before_template => sub {
 	return;
 };
 
+get '/robots.txt' => sub {
+	# Sitemap: <% request.uri_base %>/sitemap.xml
+	return 'Sitemap: ' . request->uri_base . '/sitemap.xml';
+};
+
+get '/sitemap.xml' => sub {
+	my $pages_coll = setting('db')->get_collection('pages');
+	my $pages = $pages_coll->find( { status => 'published' } );
+	# TODO: add /page/N
+	# TODO: add /tag/TAG
+
+	my $url = request->base;
+	$url =~ s{/$}{};
+	content_type 'application/xml';
+
+	my $xml = qq{<?xml version="1.0" encoding="UTF-8"?>\n};
+	$xml .= qq{<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n};
+
+	$xml .= qq{  <url>\n};
+		$xml .= qq{    <loc>$url/</loc>\n};
+		$xml .= sprintf qq{    <lastmod>%s</lastmod>\n}, DateTime->now->ymd;
+	$xml .= qq{  </url>\n};
+
+	while (my $p = $pages->next) {
+		$xml .= qq{  <url>\n};
+		$xml .= qq{    <loc>$url$p->{permalink}</loc>\n};
+		if ($p->{updated_timestamp}) {
+			# YYYY-MM-DD
+			$xml .= sprintf qq{    <lastmod>%s</lastmod>\n}, substr($p->{updated_timestamp}, 0, 10);
+		}
+		#$xml .= qq{    <changefreq>monthly</changefreq>\n};
+		#$xml .= qq{    <priority>0.8</priority>\n};
+		$xml .= qq{  </url>\n};
+	}
+	$xml .= qq{</urlset>\n};
+	return $xml;
+};
+
 get '/reset-password' => sub {
 	template 'reset_password';
 };
