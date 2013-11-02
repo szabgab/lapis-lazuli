@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-<link href="<% request.hostname %>/<% request.path %>" rel="self" />\n};
+<link href="<% request.hostname %>/<% request.path %>" rel="self" />
 <title><% title %></title>
 <id><% request.base_url %></id>
-<updated><% now %>Z</updated>\n};
+<updated><% now %>Z</updated>
 <% FOR p in pages %>
   <entry>
-    <title><% p.title %></title>\n};
-    <summary type="html"><![CDATA[<% p.abstract %> <% p.body %>]]></summary>\n};
-    <updated><% p.published_timestamp %>Z</updated>\n};
-    <link rel="alternate" type="text/html" href="<% p.permalink %>" />};
+    <title><% p.title %></title>
+    <summary type="html"><![CDATA[<% p.abstract %> <% p.body %>]]></summary>
+    <updated><% p.published_timestamp %>Z</updated>
+    <link rel="alternate" type="text/html" href="<% p.permalink %>" />
     <id><% p.permalink %></id>
     <content type="html"><![CDATA[<% p.abstract %> <% p.body %>]]></content>
     <author>
