@@ -19,6 +19,12 @@ if ($ENV{HARNESS_ACTIVE}) {
 
 my @site_configuration = (
 	{
+		display => 'Site title',
+		name    => 'site_title',
+		type    => 'text',
+		default => '',
+	},
+	{
 		display => 'From name',
 		name    => 'from_name',
 		type    => 'text',
