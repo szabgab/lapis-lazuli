@@ -40,7 +40,7 @@ my @site_configuration = (
 		display => 'Accepted HTML tags',
 		name    => 'accepted_html_tags',
 		type    => 'text',
-		default => 'a, b, i, ul, ol, li',
+		default => 'a, b, i, ul, ol, li, img, br, p, pre',
 	},
 );
 
@@ -895,6 +895,19 @@ sub atom_pages {
 	{ layout => 'none' };
 }
 
+# TODO
+# fetching the most recent comments is not easy.
+# fetching the most recent comments on the posts of a specific user is
+# even more expensive.
+# so the implementation has been delayed
+# Maybe this is the right time to start keeping a "cache"
+# path => { data structure }
+# /users/foo/comments.xml => {}
+# /comments.xml => {}
+# when a comment is made we call a method that will update these data
+# structures
+# we might still need a process that will be able to build them from
+# scratch.
 sub atom_comments {
 	my ($query, $subtitle) = @_;
 
@@ -1051,10 +1064,14 @@ Each Article has:
        Rich Text
        Textile 2
 
-=head2 Comment
+=head2 Comments
 
 Allow comments on the article specific pages.
 
+Have a link "Comment" and for every existing comment have a link
+"Reply". Once clicked, open a text editor and let the
+user type some text (some HTML might be allowed).
+Allow formatting (HTML/Markdown etc).
 
 =head2 HTML tags
 
@@ -1065,12 +1082,17 @@ Default is: a, b, i, ul, ol, li
 
 =head2 Listing posts
 
-The main page lists the N most recent posts. N can be set by the administrator
+Layout of the reader pages:
+
+The main page lists the N most recent posts showing only the "abstract" part.
+N can be set by the administrator
 and it defaults to 10. If there are more posts a link will be shown at the
 bottom of the page to the next page   /page/2 and so on.
 
-=head2 Permalink of each post is
+/page/1 is also available but it redirects to the main page
 
+
+=head2 Permalink of each post is
 
 /users/USER_NAME/YYYY/MM/BASENAME.html
 
@@ -1083,7 +1105,12 @@ Each comment has an achon #comment-COMMENTID
 
 =head2 Search
 
-=Feeds
+Search: full textsearch on the posts and comments
+
+Limit the search for the posts of a user and the
+comments made on her posts.
+
+=head2 Feeds
 
 /atom.xml is the feed of the most recent entries
 /comments.xml is the feed of the most recent comments
@@ -1091,7 +1118,44 @@ Each comment has an achon #comment-COMMENTID
 For pages of individual users (and posts by users), so basically
 /users/USERNAME/atom.xml
 
+=head2 Site Configuration
 
+Configuration option that the Administrators can set
+
+=over 4
+
+=item Site Title
+
+=item From Name
+
+=item From Email
+
+=item Page size
+
+Number of entries shown when listing entries
+(e.g. main page, page/N, search results etc.)
+
+=item Accepted HTML tags
+
+A list of HTML tags that will be accepted.
+
+=item Enable Comments
+
+Enable/Disable 
+
+Let user override (Yes/No)
+
+=back
+
+=head2 User Preferences
+
+=over 4
+
+=item Comments
+
+Enable/Disable (for all the posts of this user)
+
+=back
 
 =cut
 

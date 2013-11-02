@@ -64,36 +64,3 @@ Manage Entries:
  Clicking on an entry leads to the "Create Entry" page
  but now it is called "Edit Entry"
 
-
-Preferences:
-  General:
-     Name:
-     Description: (text)
-     Timezone
-     License: ?
-  Publishing:
-     File extension: html  (but could be changed)
-     Preferred Archive:
-     TBD
-  Entry: TBD
-  Comments:
-    Enable/Disable (for all the posts of this user)
-    TBD
-
-Commenting:
-  Just type some text (some HTML might be allowed)
-  Or if there is already a comment click "Reply"
-
-Search: full textsearch on the posts and comments
-
-Layout of the reader pages:
-Main page:  On the main page a list of articles:
-
-  At the bottom of the page one can click on
-  Page 2  that leads to /page/2
-  and then /page/3 etc
-
-  /page/1 is also available but IMHO should redirect to the
-    main page
-  Goes all the way to /page/567 showing thevery first entry.
-
