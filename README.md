@@ -13,12 +13,13 @@ TODO
 
 Allow page to be written in Markdown (see format)
 
-<link rel=alternate type="application/atom+xml" title=Entries href="<% request.uri_base %>/atom.xml">
-<link rel=alternate type="application/atom+xml" title=Comments href="<% request.uri_base %>/comments.xml">
-
 For pages of individual users (and posts by users)
 <link rel="alternate" type="application/atom+xml" title="Entries" href="<% request.uri_base %>/users/<% username %>/atom.xml" />
 
+
+Register searches and let admin see them. (If they are searches limited to a
+user, then maybe even let the user see them.)
+Let them set preferred results for specific frequent search terms.
 
 - When deleting a user ask for confirmation
   and remove all the posts and comments the user made.
@@ -85,14 +86,9 @@ Preferences:
 
 Commenting:
   Just type some text (some HTML might be allowed)
-  Or if ther is already a comment click "Reply"
-
+  Or if there is already a comment click "Reply"
 
 Search: full textsearch on the posts and comments
-
-
-
-
 
 Layout of the reader pages:
 Main page:  On the main page a list of articles:
@@ -104,16 +100,4 @@ Main page:  On the main page a list of articles:
   /page/1 is also available but IMHO should redirect to the
     main page
   Goes all the way to /page/567 showing thevery first entry.
-
-
-The Permalink of each post is
-   /users/USER_NAME/YYYY/MM/BASENAME.html
-   It showsboth the body and the extented part of the post
-   together with the tags and the comments.
-
-   #comments is the anchor to the top of the comments
-   Each comment has an achon #comment-COMMENTID
-   (the commentid is a number)
-
-Feeds:
 

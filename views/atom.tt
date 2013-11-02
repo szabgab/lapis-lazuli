@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+<link href="<% request.hostname %>/<% request.path %>" rel="self" />\n};
+<title><% title %></title>
+<id><% request.base_url %></id>
+<updated><% now %>Z</updated>\n};
+<% FOR p in pages %>
+  <entry>
+    <title><% p.title %></title>\n};
+    <summary type="html"><![CDATA[<% p.abstract %> <% p.body %>]]></summary>\n};
+    <updated><% p.published_timestamp %>Z</updated>\n};
+    <link rel="alternate" type="text/html" href="<% p.permalink %>" />};
+    <id><% p.permalink %></id>
+    <content type="html"><![CDATA[<% p.abstract %> <% p.body %>]]></content>
+    <author>
+       <name><% p.author.display_name %></name>
+    </author>
+  </entry>
+<% END %>
+</feed>
+
+

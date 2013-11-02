@@ -96,9 +96,7 @@ hook before_template => sub {
 	my $t = shift;
 
 	if (_site_exists() and not $t->{title}) {
-		my $sites_coll = setting('db')->get_collection('sites');
-		my $sites  = $sites_coll->find();
-		$t->{title} = $sites->next->{site_title};
+		$t->{title} = _get_site_title();
 	}
 
 	if (logged_in()) {
@@ -121,6 +119,20 @@ hook before_template => sub {
 get '/robots.txt' => sub {
 	# Sitemap: <% request.uri_base %>/sitemap.xml
 	return 'Sitemap: ' . request->uri_base . '/sitemap.xml';
+};
+
+get '/atom.xml' => sub {
+	my %query = (
+		status => 'published',
+	);
+	atom(\%query, '');
+};
+
+get '/comments.xml' => sub {
+	my %query = (
+		status => 'published',
+	);
+	atom(\%query, '');
 };
 
 get '/sitemap.xml' => sub {
@@ -277,10 +289,16 @@ get '/search' => sub {
 	_list_pages($this_page, \%query);
 };
 
+# TODO: refactor: (site_title should be the _id and 'sites' should be united with the
+# 'config' collection
+sub _get_site_title {
+	my $sites_coll = setting('db')->get_collection('sites');
+	my $sites  = $sites_coll->find();
+	return $sites->next->{site_title};
+}
 
 sub _list_pages {
 	my ($this_page, $query) = @_;
-
 
 	my $pages_coll = setting('db')->get_collection('pages');
 	my $page_size = _site_config->{page_size};
@@ -805,6 +823,45 @@ sub logged_in {
 	return 1;
 }
 
+sub atom {
+	my ($query, $subtitle) = @_;
+
+	my $title = _get_site_title();
+	if ($subtitle) {
+		$title .= " - $subtitle";
+	}
+	my $pages_coll = setting('db')->get_collection('pages');
+	my $page_size = _site_config->{page_size};
+
+	my $pages = $pages_coll
+		->find( $query )
+		->sort( { created_timestamp => -1} )
+		->limit( $page_size );
+
+	my $url = request->uri_base;
+	$url =~ s{/$}{};
+
+	my $users_coll = setting('db')->get_collection('users');
+	my @pages;
+	while (my $page = $pages->next) {
+		#$page->{id} = $page->{_id};
+		my $user = $users_coll->find_one({ _id => $page->{author_id} });
+		#$page->{author}{username}     = $user->{username};
+		$page->{author}{display_name} = $user->{display_name} || $user->{username};
+		#$page->{number_of_comments} = @{ $page->{comments} || [] };
+		$page->{permalink} = $url . $page->{permalink};
+		push @pages, $page;
+	 };
+
+	content_type 'application/atom+xml';
+	return template 'atom', {
+		pages => \@pages,
+		now   => DateTime->now,
+		title => $title,
+	},
+	{ layout => 'none' };
+}
+
 
 true;
 
@@ -937,6 +994,17 @@ The main page lists the N most recent posts. N can be set by the administrator
 and it defaults to 10. If there are more posts a link will be shown at the
 bottom of the page to the next page   /page/2 and so on.
 
+=head2 Permalink of each post is
+
+
+/users/USER_NAME/YYYY/MM/BASENAME.html
+
+It shows both the body and the extented part of the post
+together with the tags and the comments.
+
+#comments is the anchor to the top of the comments
+Each comment has an achon #comment-COMMENTID
+(the commentid is a number)
 
 =head2 Search
 
