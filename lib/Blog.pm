@@ -98,10 +98,10 @@ hook before_template => sub {
 	if (_site_exists() and not $t->{title}) {
 		$t->{title} = _get_site_title();
 	}
+	my $users_coll = setting('db')->get_collection('users');
 
 	if (logged_in()) {
 		my $user_id = session('user_id');
-		my $users_coll = setting('db')->get_collection('users');
 		my $user  = $users_coll->find_one({ _id => $user_id });
 		$t->{user}{display_name} = $user->{display_name} || $user->{username};
 		$t->{user}{admin} = $user->{admin};
@@ -113,6 +113,15 @@ hook before_template => sub {
 	$t->{accepted_html_tags} = to_json accepted_html_tags();
 	$t->{query} = params->{query};
 
+	if (request->path =~ m{^/users/([^/]+)}) {
+		my $username = $1;
+		my $user  = $users_coll->find_one({ username => $username });
+		my $display_name = $user->{display_name};
+		$t->{user_feed} = {
+			username => $username,
+			display_name => ($display_name || $username),
+		}
+	}
 	return;
 };
 
@@ -685,6 +694,19 @@ get '/users/:username/:page' => sub {
 	pass; #return _error('not_implemented');
 };
 
+get '/users/:username/atom.xml' => sub {
+	my $users_coll = setting('db')->get_collection('users');
+	my $user  = $users_coll->find_one({ username => params->{username} });
+	pass if not $user;
+
+	my %query = (
+		status    => 'published',
+		author_id => $user->{_id},
+	);
+	atom(\%query, '');
+};
+
+
 get qr{^/users/.*} => sub {
 	my $path = request->path;
 	my $pages_coll = setting('db')->get_collection('pages');
@@ -1008,6 +1030,13 @@ Each comment has an achon #comment-COMMENTID
 
 =head2 Search
 
+=Feeds
+
+/atom.xml is the feed of the most recent entries
+/comments.xml is the feed of the most recent comments
+
+For pages of individual users (and posts by users), so basically
+/users/USERNAME/atom.xml
 
 
 

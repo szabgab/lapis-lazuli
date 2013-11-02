@@ -13,10 +13,6 @@ TODO
 
 Allow page to be written in Markdown (see format)
 
-For pages of individual users (and posts by users)
-<link rel="alternate" type="application/atom+xml" title="Entries" href="<% request.uri_base %>/users/<% username %>/atom.xml" />
-
-
 Register searches and let admin see them. (If they are searches limited to a
 user, then maybe even let the user see them.)
 Let them set preferred results for specific frequent search terms.
