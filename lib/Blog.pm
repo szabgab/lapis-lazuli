@@ -45,13 +45,19 @@ my @site_configuration = (
 );
 
 sub _site_config {
-	my $db = Blog::DB->instance->db;
 	my $config_coll = setting('db')->get_collection('config');
 	my %defaults = map { $_->{name} => $_->{default} } @site_configuration;
 	my $cfg = $config_coll->find_one({ _id => 'site_config' }) || {};
 	my %config = (%defaults, %$cfg);
 	return \%config;
 }
+
+sub _site_exists {
+	my $config_coll = setting('db')->get_collection('config');
+	my $cfg = $config_coll->find_one({ _id => 'site_config' }) || {};
+	return $cfg && %$cfg ? 1 : 0;
+}
+
 
 
 #hook on_route_exception => sub {
@@ -96,7 +102,7 @@ hook before_template => sub {
 	my $t = shift;
 
 	if (_site_exists() and not $t->{title}) {
-		$t->{title} = _get_site_title();
+		$t->{title} = _site_config->{site_title};
 	}
 	my $users_coll = setting('db')->get_collection('users');
 
@@ -298,14 +304,6 @@ get '/search' => sub {
 	_list_pages($this_page, \%query);
 };
 
-# TODO: refactor: (site_title should be the _id and 'sites' should be united with the
-# 'config' collection
-sub _get_site_title {
-	my $sites_coll = setting('db')->get_collection('sites');
-	my $sites  = $sites_coll->find();
-	return $sites->next->{site_title};
-}
-
 sub _list_pages {
 	my ($this_page, $query) = @_;
 
@@ -353,16 +351,16 @@ get '/setup' => sub {
 
 post '/setup' => sub {
 
-	my $sites_coll = setting('db')->get_collection('sites');
 	return _error('site_exists') if _site_exists();
 
 	my $site_title = params->{site_title};
 	return _error('missing_site_title') if not $site_title;
 	$site_title =~ s/^\s+|\s+$//g;
 	return _error('invalid_site_title') if not $site_title;
-	my $site_id = $sites_coll->insert({ site_title => $site_title });
-	# TODO without the quotes we get  huge and unusable stack trace
-	#die "$site_id";
+
+	my $config_coll = setting('db')->get_collection('config');
+	$config_coll->insert({ _id => 'site_config',  site_title => $site_title });
+	$config_coll->insert({ _id => 'comment_id', seq => 0 });
 
 	my $users_coll = setting('db')->get_collection('users');
 	$users_coll->ensure_index({ username => 1 }, {
@@ -373,9 +371,6 @@ post '/setup' => sub {
 	$user_data->{admin} = 1;
 	my $user_id    = $users_coll->insert($user_data);
 
-	my $config_coll = setting('db')->get_collection('config');
-	$config_coll->insert({ _id => 'site_config' });
-	$config_coll->insert({ _id => 'comment_id', seq => 0 });
 
 	#my $pages_coll = setting('db')->get_collection('pages');
 	#$pages_coll->ensure_index({ basename => 1 }, {
@@ -837,15 +832,6 @@ sub _generate_code {
 }
 
 
-sub _site_exists {
-	my $sites_coll = setting('db')->get_collection('sites');
-	if ($sites_coll) {
-		my $sites  = $sites_coll->find();
-		return 1 if $sites->all;
-	}
-	return;
-}
-
 sub logged_in {
 	my $TIMEOUT = 24*60*60;
 
@@ -859,7 +845,7 @@ sub logged_in {
 sub atom_pages {
 	my ($query, $subtitle) = @_;
 
-	my $title = _get_site_title();
+	my $title = _site_config->{site_title};
 	if ($subtitle) {
 		$title .= $subtitle;
 	}
@@ -911,7 +897,7 @@ sub atom_pages {
 sub atom_comments {
 	my ($query, $subtitle) = @_;
 
-	my $title = _get_site_title();
+	my $title = _site_config->{site_title};
 	if ($subtitle) {
 		$title .= $subtitle;
 	}
