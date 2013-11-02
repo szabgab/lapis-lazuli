@@ -679,19 +679,19 @@ post '/u/edit-profile' => sub {
 	};
 };
 
-get '/users/:username/:page' => sub {
-	my $username = params->{username};
-	my $page = params->{page};
-	if ($page eq 'profile') {
-		my $users_coll = setting('db')->get_collection('users');
-		my $user  = $users_coll->find_one({ username => $username });
-		if (not $user) {
-			return template 'message', { no_such_username => 1 };
-		}
+get '/users' => sub {
+	my $users_coll = setting('db')->get_collection('users');
+	my $users = $users_coll->find();
+	template 'list_users', { users => [$users->all] };
+};
 
-		return template 'profile', { the_user => $user };
-	}
-	pass; #return _error('not_implemented');
+get '/users/:username/profile' => sub {
+	my $username = params->{username};
+	my $users_coll = setting('db')->get_collection('users');
+	my $user  = $users_coll->find_one({ username => $username });
+	pass if not $user;
+
+	return template 'profile', { the_user => $user };
 };
 
 get '/users/:username/atom.xml' => sub {
@@ -737,7 +737,10 @@ get '/a/list-users' => sub {
 	my $users_coll = setting('db')->get_collection('users');
 	my $all_users = $users_coll->find();
 
-	template 'list_users', {users => [map {$_->{id} = $_->{_id}; $_ } $all_users->all]};
+	template 'list_users', {
+		users => [map {$_->{id} = $_->{_id}; $_ } $all_users->all],
+		admin_view => 1,
+	};
 };
 
 get '/a/user' => sub {
