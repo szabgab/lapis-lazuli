@@ -134,14 +134,14 @@ get '/atom.xml' => sub {
 	my %query = (
 		status => 'published',
 	);
-	atom(\%query, '');
+	atom_pages(\%query, '');
 };
 
 get '/comments.xml' => sub {
 	my %query = (
 		status => 'published',
 	);
-	atom(\%query, '');
+	atom_comments(\%query, '');
 };
 
 get '/sitemap.xml' => sub {
@@ -386,8 +386,16 @@ post '/setup' => sub {
 	#redirect '/';
 };
 
+sub get_current {
+	my ($field) = @_;
+
+	my $config_coll = setting('db')->get_collection('config');
+	return $config_coll->find_one( { _id => $field } )->{seq};
+}
+
 sub get_next {
 	my ($field) = @_;
+
 	my $config_coll = setting('db')->get_collection('config');
 	return $config_coll->find_and_modify( {
 		query  => { _id => $field },
@@ -703,7 +711,7 @@ get '/users/:username/atom.xml' => sub {
 		status    => 'published',
 		author_id => $user->{_id},
 	);
-	atom(\%query, '');
+	atom_pages(\%query, ' of ' . ($user->{display_name} || $user->{username}));
 };
 
 
@@ -848,12 +856,12 @@ sub logged_in {
 	return 1;
 }
 
-sub atom {
+sub atom_pages {
 	my ($query, $subtitle) = @_;
 
 	my $title = _get_site_title();
 	if ($subtitle) {
-		$title .= " - $subtitle";
+		$title .= $subtitle;
 	}
 	my $pages_coll = setting('db')->get_collection('pages');
 	my $page_size = _site_config->{page_size};
@@ -877,6 +885,48 @@ sub atom {
 		$page->{permalink} = $url . $page->{permalink};
 		push @pages, $page;
 	 };
+
+	content_type 'application/atom+xml';
+	return template 'atom', {
+		pages => \@pages,
+		now   => DateTime->now,
+		title => $title,
+	},
+	{ layout => 'none' };
+}
+
+sub atom_comments {
+	my ($query, $subtitle) = @_;
+
+	my $title = _get_site_title();
+	if ($subtitle) {
+		$title .= $subtitle;
+	}
+
+	my $url = request->uri_base;
+	$url =~ s{/$}{};
+
+	my $comment_id = get_current('comment_id');
+	my $page_size = _site_config->{page_size};
+
+	my $pages_coll = setting('db')->get_collection('pages');
+	my $users_coll = setting('db')->get_collection('users');
+
+	my @pages;
+	#my $pages = $pages_coll
+	#	->find( $query )
+	#	->sort( { created_timestamp => -1} )
+	#	map { @{$_->{comments} $pages->{all}
+	#
+	#while (my $page = $pages->next) {
+	#	#$page->{id} = $page->{_id};
+	#	my $user = $users_coll->find_one({ _id => $page->{author_id} });
+	#	#$page->{author}{username}     = $user->{username};
+	#	$page->{author}{display_name} = $user->{display_name} || $user->{username};
+	#	#$page->{number_of_comments} = @{ $page->{comments} || [] };
+	#	$page->{permalink} = $url . $page->{permalink};
+	#	push @pages, $page;
+	# };
 
 	content_type 'application/atom+xml';
 	return template 'atom', {
