@@ -434,6 +434,89 @@ post '/register' => sub {
 	template 'message', { 'just_registered' => 1 };
 };
 
+get '/login/openid' => sub {
+	return <<"END_FORM";
+<form method="POST">
+<input name="url">
+<input type="submit">
+</form>
+END_FORM
+};
+
+# workaround to satisfy the expectation of Net::OpenID::Consumer
+sub Blog::MyCGI::param {
+	my ($self, $name) = @_;
+	if ($name) {
+		return params->{$name};
+	}
+	my %p = request->params;
+	my @p = keys %p;
+	return @p;
+}
+sub _oid {
+	use Net::OpenID::Consumer;
+	use LWP::UserAgent;
+	use Cache::File;
+	my $csr = Net::OpenID::Consumer->new(
+		ua    => LWP::UserAgent->new,
+		#cache => Cache::File->new( cache_root => '/tmp/mycache' ),
+		args  => bless({}, 'Blog::MyCGI' ),
+		consumer_secret => sub { 'syzygy' }, #time,
+	#	required_root => request->host,
+		#assoc_options => [
+		#	max_encrypt => 1,
+		#	session_no_encrypt_https => 1,
+		#],
+	);
+}
+
+get '/login/openid/reply' => sub {
+	my $csr = _oid();
+
+	$csr->handle_server_response(
+		not_openid => sub {
+            return _error('not_openid');
+        },
+		setup_needed => sub {
+            if ($csr->message->protocol_version < 2) {
+                my $setup_url = $csr->user_setup_url;
+                return 'Setup_url: ' . $setup_url if $setup_url;
+            }
+            return 'You must login with your provider first.';
+        },
+		cancelled => sub {
+            return _error('openid_canceled');
+        },
+		verified => sub {
+            my ($verified_identity) = @_;
+            return 'Verified identity url: ' . $verified_identity->url;
+        },
+		error => sub {
+            my ($error) = @_;
+            return 'Other Error: ' . $csr->err;
+        },
+	);
+};
+
+post '/login/openid' => sub {
+	my $csr = _oid();
+
+	my $claimed_identity = $csr->claimed_identity(params->{url});
+	unless ($claimed_identity) {
+		die "not actually an openid?  " . $csr->err;
+	}
+
+	my $check_url = $claimed_identity->check_url(
+		return_to  => request->uri_base . "/login/openid/reply",
+		trust_root => request->uri_base,
+		delayed_return => 1,
+	);
+	redirect $check_url;
+};
+
+
+get '/login/google' => sub {
+};
 
 get '/login' => sub {
 	template 'login';

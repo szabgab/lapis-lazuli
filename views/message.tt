@@ -181,4 +181,12 @@ The tag <b><% tag %></b> is not accepted.
 
 
 
+<% IF not_openid %>
+Not Open ID
+<% END %>
+
+<% IF openid_canceled %>
+OpenID Request canceled
+<% END %>
+
 

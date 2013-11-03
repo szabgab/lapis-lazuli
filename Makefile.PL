@@ -29,6 +29,11 @@ WriteMakefile(
 		'MooX::Singleton'  => '1.20',
 		'MooX::Types::MooseLike::Base' => '0.25',
 		'Text::Markdown'   => '1.000031',
+
+
+		'Net::OpenID::Consumer' => 0,
+		'LWP::UserAgent'        => 0,
+		'Cache::File'           => 0,
 	},
 	dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean               => { FILES => 'Blog-*' },
