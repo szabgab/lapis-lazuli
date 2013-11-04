@@ -20,30 +20,16 @@ No posts yet
 <% END %>
 
 <hr>
-<% IF search_params %>
-  <div class="page_links">
-    <% IF prev_page %>
-       <a href="/search?<% search_params %>&page=<% prev_page %>">&lt;- prev page (<% prev_page %>)</a>
-    <% END %>
-    <% IF prev_page AND next_page %>
-       |
-    <% END %>
-    <% IF next_page %>
-       <a href="/search?<% search_params %>&page=<% next_page %>">next page (<% next_page %>) -&gt;</a>
-    <% END %>
-  </div>
-<% ELSE %>
-  <div class="page_links">
-    <% IF prev_page %>
-       <a href="/page/<% prev_page %>">&lt;- prev page (<% prev_page %>)</a>
-    <% END %>
-    <% IF prev_page AND next_page %>
-       |
-    <% END %>
-    <% IF next_page %>
-       <a href="/page/<% next_page %>">next page (<% next_page %>) -&gt;</a>
-    <% END %>
-  </div>
-<% END %>
+<div class="page_links">
+  <% IF prev_page %>
+     <a href="<% prev_page %>">&lt;- prev page (<% prev_page_n %>)</a>
+  <% END %>
+  <% IF prev_page AND next_page %>
+     |
+  <% END %>
+  <% IF next_page %>
+     <a href="<% next_page %>">next page (<% next_page_n %>) -&gt;</a>
+  <% END %>
+</div>
 
 

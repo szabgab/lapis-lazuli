@@ -321,13 +321,12 @@ get '/search' => sub {
 		'$and' => \@ands,
 	);
 
-	_list_pages($this_page, \%query, join('&', @params));
+	_list_pages($this_page, \%query, \@params);
 };
 
 sub _list_pages {
 	my ($this_page, $query, $search_params) = @_;
-
-	$search_params ||= '';
+	$search_params ||= [];
 
 	my $pages_coll = setting('db')->get_collection('pages');
 	my $page_size = _site_config->{page_size};
@@ -351,13 +350,35 @@ sub _list_pages {
 		$page->{display_name} = $user->{display_name} || $user->{username};
 		$page->{number_of_comments} = @{ $page->{comments} || [] };
 		push @pages, $page;
-	 };
+	};
+
+	my %d = (
+		prev_page => '',
+		next_page => '',
+		prev_page_n => 0,
+		next_page_n => ($document_count <= $this_page*$page_size ? 0 : $this_page+1),
+	);
+
+	if ($this_page > 1) {
+		$d{prev_page_n} = $this_page-1;
+		if (request->path eq '/' or request->path =~ m{^/page/}) {
+			$d{prev_page} = "/page/$d{prev_page_n}";
+		} else {
+			$d{prev_page} = request->path . '?' . join('&', @$search_params, "page=$d{prev_page_n}");
+		}
+	}
+	if ($d{next_page_n}) {
+		if (request->path eq '/' or request->path =~ m{^/page/}) {
+			$d{next_page} = "/page/$d{next_page_n}";
+		} else {
+			$d{next_page} =  request->path . '?' . join('&', @$search_params, "page=$d{next_page_n}");
+		}
+	}
 	template 'index', {
 		pages     => \@pages,
 		this_page => $this_page,
-		prev_page => $this_page-1,
-		next_page => ($document_count <= $this_page*$page_size ? 0 : $this_page+1),
 		search_params    => $search_params,
+		%d,
 	};
 };
 
@@ -577,12 +598,6 @@ get '/logout' => sub {
 	redirect '/';
 };
 
-
-#get '/tags' => sub {
-#	return 'We need to list all the tags here';
-#};
-#
-
 post '/u/comment' => sub {
 	my $page_id = params->{page_id};
 	#my $reply_to = params->{reply_to};
@@ -789,8 +804,24 @@ get '/users/:username/profile' => sub {
 	my $user  = $users_coll->find_one({ username => $username });
 	pass if not $user;
 
-	return template 'profile', { the_user => $user };
+	return template 'profile', {
+		the_user => $user,
+	};
 };
+
+get '/users/:username/' => sub {
+	my $users_coll = setting('db')->get_collection('users');
+	my $user  = $users_coll->find_one({ username => params->{username} });
+	pass if not $user;
+
+	my $this_page = params->{page} || 1;
+	my %query = (
+		status    => 'published',
+		author_id => $user->{_id},
+	);
+	_list_pages($this_page, \%query);
+};
+
 
 get '/users/:username/atom.xml' => sub {
 	my $users_coll = setting('db')->get_collection('users');
@@ -1190,6 +1221,8 @@ Search: full textsearch on the posts and comments
 
 Limit the search for the posts of a user and the
 comments made on her posts.
+
+Paging the search result.
 
 =head2 Feeds
 
