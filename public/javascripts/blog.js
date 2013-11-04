@@ -115,5 +115,20 @@ $(document).ready(function() {
 		return false;
 	});
 
+	$("a.edit").click(function (){
+		//console.log($(this).attr('id'));
+		var id = $(this).attr('id');
+		if (id == 'new_comment') {
+			//console.log('new');
+			$("#comment_editor_form").show();
+		} else {
+			var comment_id = id.substr(5);
+			// open editor with the text of this comment and
+			// set the comment_id in the form to be the comment_id
+			alert('To be implemented');
+		}
+		return false; 
+	});
+
 
 });

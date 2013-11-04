@@ -109,3 +109,7 @@ th {
 	color: red;
 }
 
+#comment_editor_form {
+	display: none;
+}
+

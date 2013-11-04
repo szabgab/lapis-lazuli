@@ -115,6 +115,7 @@ hook before_template => sub {
 	if (logged_in()) {
 		my $user_id = session('user_id');
 		my $user  = $users_coll->find_one({ _id => $user_id });
+		$t->{user}{username} = session('username');
 		$t->{user}{display_name} = $user->{display_name} || $user->{username};
 		$t->{user}{admin} = $user->{admin};
 	}
@@ -560,11 +561,13 @@ post '/login' => sub {
 	);
 
 	my $users_coll = setting('db')->get_collection('users');
-	my $user_id    = $users_coll->find_one(\%user);
-	return _error('could_not_authenticate') if not $user_id;
+	my $user    = $users_coll->find_one(\%user);
+	return _error('could_not_authenticate') if not $user;
 
 	session last_seen => time;
-	session user_id => $user_id->{_id};
+	session user_id => $user->{_id};
+	session username => $user->{username};
+	session display_name => $user->{display_name} || $user->{username};
 
 	#forward '/'; # cannot forward, probably because this is a POST and / is only defined for GET
 	#redirect '/', 303; # the cookie is not set!
@@ -619,7 +622,10 @@ post '/u/comment' => sub {
 			'$push' => {
 				comments => {
 					id        => get_next('comment_id'),
-					user      => session('user_id'),
+					user => {
+						id       => session('user_id'),
+						username => session('username'),
+					},
 					text      => $comment,
 					timestamp => DateTime->now,
 					# TODO: response__to => comment id
