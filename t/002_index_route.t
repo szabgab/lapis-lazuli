@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use MongoDB;
+use Time::HiRes qw(sleep);
 
 # the order is important
 use Blog;
@@ -139,12 +140,18 @@ subtest '/register' => sub {
 
 my $title = "What is Lorem Ipsum?";
 my $text = <<"END_TEXT";
-Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum
+Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+It has survived not only five centuries, but also the leap into electronic typesetting,
+remaining essentially unchanged. It was popularised in the 1960s with the release of
+Letraset sheets containing Lorem Ipsum passages, and more recently with desktop
+publishing software like Aldus PageMaker including versions of Lorem Ipsum.
 END_TEXT
 # Source: http://www.lipsum.com/
 
 subtest '/u/create-post' => sub {
-	my $N = 4;
+	my $N = 6;
 	plan tests => @users * (3 + $N);
 	my $cnt = 0;
 
@@ -190,7 +197,7 @@ subtest '/u/create-post' => sub {
 				},
 			};
 			is $r4->content, 1;
-			sleep 1; # wait so the time stamps will be really different
+			sleep 0.1; # wait so the time stamps will be different
 		}
 	}
 };

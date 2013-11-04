@@ -29,6 +29,7 @@ WriteMakefile(
 		'MooX::Singleton'  => '1.20',
 		'MooX::Types::MooseLike::Base' => '0.25',
 		'Text::Markdown'   => '1.000031',
+		'Time::HiRes'      => '1.9725',
 
 
 		'Net::OpenID::Consumer' => 0,
