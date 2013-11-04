@@ -38,12 +38,12 @@ $(document).ready(function() {
 	$("#title").on('change, keyup paste', function() {
 		// if basename is not locked
 		if ( $("#basename_lock").is(':checked') ) {
-			return False;
+			return false;
 		}
 
 		// if status is published, do not change the basename
 		if ( $("#status").val() == 'published' ) {
-			return False;
+			return false;
 		}
 		// TODO we should probably make sure the basename cannot be changed
 		// at all after the article was published.
@@ -102,5 +102,18 @@ $(document).ready(function() {
 	$("#body_editor").bind('input propertychange', function() {
 		editor_preview();
 	});
+
+	$("#openid_login_form").hide();
+	$("#show_openid_login_form").click(function () {
+		$("#regular_login_form").hide();
+		$("#openid_login_form").show();
+		return false;
+	});
+	$("#show_regular_login_form").click(function () {
+		$("#openid_login_form").hide();
+		$("#regular_login_form").show();
+		return false;
+	});
+
 
 });

@@ -434,15 +434,6 @@ post '/register' => sub {
 	template 'message', { 'just_registered' => 1 };
 };
 
-get '/login/openid' => sub {
-	return <<"END_FORM";
-<form method="POST">
-<input name="url">
-<input type="submit">
-</form>
-END_FORM
-};
-
 # workaround to satisfy the expectation of Net::OpenID::Consumer
 sub Blog::MyCGI::param {
 	my ($self, $name) = @_;
@@ -456,7 +447,7 @@ sub Blog::MyCGI::param {
 sub _oid {
 	use Net::OpenID::Consumer;
 	use LWP::UserAgent;
-	use Cache::File;
+	#use Cache::File;
 	my $csr = Net::OpenID::Consumer->new(
 		ua    => LWP::UserAgent->new,
 		#cache => Cache::File->new( cache_root => '/tmp/mycache' ),

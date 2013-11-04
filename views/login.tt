@@ -1,9 +1,20 @@
+<div id="regular_login_form">
 <form method="POST">
  <b>Username:</b><input name="username" /></br>
  <b>Password:</b><input name="password" type="password" /></br>
  <input type="submit" value="Log in" />
 </form>
+</div>
 
-Login with your <a href="/login/google">Google Account</a> or
-<a href="/login/openid">Open ID</a>.
+<div id="openid_login_form">
+<form method="POST">
+<input name="url">
+<input type="submit" value="Log in">
+</form>
+</div>
+
+Login with your
+<a id="show_regular_login_form" href="">account</a>
+<!-- or with your <a href="">Google Account</a> -->
+or with your <a id="show_openid_login_form" href="">Open ID</a>.
 
