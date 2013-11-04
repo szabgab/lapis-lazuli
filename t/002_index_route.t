@@ -4,6 +4,7 @@ use warnings;
 
 use MongoDB;
 use Time::HiRes qw(sleep);
+use List::Util qw(shuffle);
 
 # the order is important
 use Blog;
@@ -125,6 +126,7 @@ my @users = (
 		password_confirm => 'foo_pw',
 	},
 );
+my @tags = qw(one two three four five);
 
 subtest '/register' => sub {
 	plan tests => 2*@users;
@@ -187,6 +189,8 @@ subtest '/u/create-post' => sub {
 			if ($j == 1) {
 				$split = length $text;
 			}
+
+			my $tags = join ',', (shuffle @tags)[0 .. 1 + rand @tags-1];
 			my $r4 = dancer_response POST => '/u/create-post', {
 				params => {
 					title => "$title ($users[$i]{username}) [$j]",
@@ -194,6 +198,7 @@ subtest '/u/create-post' => sub {
 					abstract => substr($text, 0, $split),
 					body     => substr($text, $split),
 					status   => 'published',
+					tags     => $tags,
 				},
 			};
 			is $r4->content, 1;

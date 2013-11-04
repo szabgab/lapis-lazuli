@@ -14,7 +14,7 @@ var accepted_html_tags = <% accepted_html_tags %>;
 <div id="tags">
 <ul>
 <% FOR t IN page.tags %>
-  <li><a href="/tag/<% t %>"><% t %></a></li>
+  <li><a href="/search?tag=<% t %>"><% t %></a></li>
 <% END %>
 </ul>
 </div>

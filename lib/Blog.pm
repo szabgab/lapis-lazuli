@@ -296,22 +296,38 @@ get '/page/:n' => sub {
 
 get '/search' => sub {
 	my $query = params->{query};
+	my $tag   = params->{tag};
 	my $this_page  = params->{page} || 1;
 	# TODO check input
 
+	my @ands;
+	my @params;
+	if ($tag) {
+		push @ands, { tags => $tag };
+		push @params, "tag=$tag";
+	}
+	if ($query) {
+		push @ands, {
+			'$or' => [
+				{ abstract => { '$regex' => $query } },
+				{ body => { '$regex' => $query } },
+			],
+		};
+		push @params, "query=$query";
+	}
+
 	my %query = (
-		status => 'published', 
-		'$or' => [
-			{ abstract => { '$regex' => $query } },
-			{ body => { '$regex' => $query } },
-		],
+		status => 'published',
+		'$and' => \@ands,
 	);
 
-	_list_pages($this_page, \%query);
+	_list_pages($this_page, \%query, join('&', @params));
 };
 
 sub _list_pages {
-	my ($this_page, $query) = @_;
+	my ($this_page, $query, $search_params) = @_;
+
+	$search_params ||= '';
 
 	my $pages_coll = setting('db')->get_collection('pages');
 	my $page_size = _site_config->{page_size};
@@ -341,6 +357,7 @@ sub _list_pages {
 		this_page => $this_page,
 		prev_page => $this_page-1,
 		next_page => ($document_count <= $this_page*$page_size ? 0 : $this_page+1),
+		search_params    => $search_params,
 	};
 };
 
@@ -561,12 +578,10 @@ get '/logout' => sub {
 };
 
 
-get '/tag/:tag' => sub {
-	my $tag = params->{tag};
-	my $pages_coll = setting('db')->get_collection('pages');
-	my $pages = $pages_coll->find({ tags => $tag });
-	template 'index', {pages => [map {$_->{id} = $_->{_id}; $_ } $pages->all]};
-};
+#get '/tags' => sub {
+#	return 'We need to list all the tags here';
+#};
+#
 
 post '/u/comment' => sub {
 	my $page_id = params->{page_id};

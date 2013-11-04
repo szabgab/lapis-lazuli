@@ -16,21 +16,20 @@ No posts yet
 	<div class="continue_reading_link">
     <a href="<% p.permalink %>"><% IF p.body %>Continue reading<% ELSE %>Permalink<% END %></a>
 	</div>
-
   </div>
 <% END %>
 
 <hr>
-<% IF query %>
+<% IF search_params %>
   <div class="page_links">
     <% IF prev_page %>
-       <a href="/search?query=<% query %>&page=<% prev_page %>">&lt;- prev page (<% prev_page %>)</a>
+       <a href="/search?<% search_params %>&page=<% prev_page %>">&lt;- prev page (<% prev_page %>)</a>
     <% END %>
     <% IF prev_page AND next_page %>
        |
     <% END %>
     <% IF next_page %>
-       <a href="/search?query=<% query %>&page=<% next_page %>">next page (<% next_page %>) -&gt;</a>
+       <a href="/search?<% search_params %>&page=<% next_page %>">next page (<% next_page %>) -&gt;</a>
     <% END %>
   </div>
 <% ELSE %>
