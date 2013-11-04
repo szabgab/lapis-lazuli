@@ -57,6 +57,21 @@ $(document).ready(function() {
 		$("#basename").val(title);
 	});
 
+	$("#cancel").click(function() {
+		var form = 	$(this).parent();
+		if ( form.attr('id') == 'post_form' ) {
+			alert("Cancel Not implemented");
+		} else if ( form.attr('id') == 'comment_editor_form' ) {
+			$("#comment_editor_section").hide();
+			$("#comment_editor").val('');
+			$("#comment_alert").html('');
+			$("#comment_preview").html('');
+		} else {
+			alert("Strange, apparently this cancel button is not implemented yet");
+		}
+		return false;
+	});
+
 	$("#submit").click(function() {
 		var form = 	$(this).parent();
 		//console.log(form.attr('id'));
@@ -137,9 +152,23 @@ $(document).ready(function() {
 			$("#comment_editor_section").show();
 		} else {
 			var comment_id = id.substr(5);
+			var data = {
+				'post_id' : $("#page_id").val(),
+				'comment_id': comment_id,
+			};
+			console.log(data);
+			$.get("/u/get-comment", data, function(resp) {
+				//console.log('success');
+				//console.log(resp);
+				$("#comment_id").val(comment_id);
+				$("#comment_editor_section").show();
+				$("#comment_editor").val(resp);
+			}).fail(function() {
+				console.log('fail');
+				alert('fail');
+			});
 			// open editor with the text of this comment and
 			// set the comment_id in the form to be the comment_id
-			alert('To be implemented');
 		}
 		return false; 
 	});

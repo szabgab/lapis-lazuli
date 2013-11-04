@@ -189,4 +189,7 @@ Not Open ID
 OpenID Request canceled
 <% END %>
 
+<% IF no_such_comment %>
+No such comment id.
+<% END %>
 

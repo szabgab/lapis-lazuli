@@ -603,6 +603,7 @@ get '/logout' => sub {
 
 post '/u/comment' => sub {
 	my $page_id = params->{page_id};
+	my $comment_id = params->{comment_id};
 	#my $reply_to = params->{reply_to};
 	my $comment = params->{comment_editor}; 
 	return _error('no_comment_text') if not $comment;
@@ -617,22 +618,43 @@ post '/u/comment' => sub {
 		return _error('html_not_accepted', tag => $tag) if not $accept->{$tag};
 	}
 
-	$pages_coll->update({ _id => MongoDB::OID->new(value => $page_id) },
-		{
-			'$push' => {
-				comments => {
-					id        => get_next('comment_id'),
-					user => {
-						id       => session('user_id'),
-						username => session('username'),
-					},
-					text      => $comment,
-					timestamp => DateTime->now,
-					# TODO: response__to => comment id
+	if ($comment_id) {
+		my ($old_comment) = grep {$_->{id} eq $comment_id} @{ $page->{comments} };
+		return _error('no_such_comment') if not $old_comment;
+
+		# TODO check if the user has the right to update this comment
+		#$pages_coll->update({ _id => MongoDB::OID->new(value => $page_id) },
+		#	{ 'comment.$.
+	} else {
+		$pages_coll->update({ _id => MongoDB::OID->new(value => $page_id) },
+			{
+				'$push' => {
+					comments => {
+						id        => get_next('comment_id'),
+						user => {
+							id       => session('user_id'),
+							username => session('username'),
+						},
+						text      => $comment,
+						timestamp => DateTime->now,
+						# TODO: response__to => comment id
+					}
 				}
-			}
-		}); 
+			}); 
+	}
 	redirect $page->{permalink};
+};
+
+get '/u/get-comment' => sub {
+	my $post_id = params->{post_id};
+	my $comment_id = params->{comment_id};
+	my $pages_coll = setting('db')->get_collection('pages');
+	my $page  = $pages_coll->find_one({ _id => MongoDB::OID->new(value => $post_id) });
+	return '' if not $page;
+	#return Dumper $page;
+	my ($comment) = grep {$_->{id} ==$comment_id} @{ $page->{comments} };
+	return '' if not $comment;
+	return $comment->{text};
 };
 
 
