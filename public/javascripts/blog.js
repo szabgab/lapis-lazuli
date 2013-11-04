@@ -56,21 +56,35 @@ $(document).ready(function() {
 		title = title.replace(/[^\w-]+/g, '-');
 		$("#basename").val(title);
 	});
-	$("#submit").click(function() {
-		var data = $("#post_form").serialize();
-		//console.log('hi');
 
-		// It seems serialize does not fetch the value of disabled fields
-		//console.log(data.title);
-		data += "&basename=" + $("#basename").val();
-		//console.log(data);
-		$.post("/u/create-post", data, function() {
-			console.log('success');
-			alert('success');
-		}).fail(function() {
-			console.log('fail');
-			alert('fail');
-		});
+	$("#submit").click(function() {
+		var form = 	$(this).parent();
+		//console.log(form.attr('id'));
+		//return;
+		var data = form.serialize();
+		if ( form.attr('id') == 'post_form' ) {
+			// TODO validate before submitting!
+			// It seems serialize does not fetch the value of disabled fields
+			data += "&basename=" + $("#basename").val();
+			//console.log(data);
+			$.post("/u/create-post", data, function() {
+				console.log('success');
+				alert('success');
+			}).fail(function() {
+				console.log('fail');
+				alert('fail');
+			});
+			return false;
+		} else if ( form.attr('id') == 'comment_editor_form' ) {
+			$("#comment_editor_section").hide();
+			$("#comment_alert").html('');
+			$("#comment_preview").html('Thank you for commenting!');
+			console.log(form.attr('action'));
+			return true;
+		} else {
+			alert("Strange, apparently this submit button is not implemented yet");
+			return false;
+		}
 	});
 
 	$("#comment_editor").bind('input propertychange', function() {
@@ -120,7 +134,7 @@ $(document).ready(function() {
 		var id = $(this).attr('id');
 		if (id == 'new_comment') {
 			//console.log('new');
-			$("#comment_editor_form").show();
+			$("#comment_editor_section").show();
 		} else {
 			var comment_id = id.substr(5);
 			// open editor with the text of this comment and

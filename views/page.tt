@@ -46,12 +46,12 @@ No comments yet. Be the first to comment!
   Would you like add a <a class="edit" id="new_comment">comment</a>?
   </div>
 
-  <div id="comment_editor_form">
+  <div id="comment_editor_section">
   Type in your comment:
-    <form method="POST" action="/u/comment">
+    <form method="POST" id="comment_editor_form" action="/u/comment">
     <input type="hidden" name="page_id" value="<% page.id %>" />
     <textarea name="comment_editor" id="comment_editor" rows="20" cols="80"></textarea>
-    <input type="submit" value="Save" />
+    <input type="submit" id="submit" value="Save" />
     </form>
   </div>
 <% ELSE %>
